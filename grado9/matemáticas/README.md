@@ -1,3 +1,3 @@
-# Periodo 3
+# Matemáticas - Grado 9
 
-Guías de aprendizaje, proyectos, actividades y recursos correspondientes al tercer período de Tecnología para grado sexto.
+Recursos, ejercicios interactivos, actividades de práctica, evaluaciones y material de apoyo para el aprendizaje de las Matemáticas en grado octavo.

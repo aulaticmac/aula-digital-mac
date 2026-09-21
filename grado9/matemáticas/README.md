@@ -1,3 +1,3 @@
 # Ciencias- - Grado 9
 
-Guías de aprendizaje, actividades, laboratorios virtuales y recursos correspondientes al primer período de Matemáticas para grado noveno.
+Recursos, ejercicios interactivos, actividades de práctica, evaluaciones y material de apoyo para el aprendizaje de las Matemáticas en grado noveno.

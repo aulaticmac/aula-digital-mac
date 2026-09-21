@@ -1,3 +1,3 @@
-# Período 1
+# Período 3
 
 Guías de aprendizaje, actividades, laboratorios virtuales y recursos correspondientes al primer período de Ciencias Naturales para grado sexto.

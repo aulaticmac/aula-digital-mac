@@ -1,3 +1,3 @@
 # Ciencias- - Grado 8
 
-Guías de aprendizaje, actividades, laboratorios virtuales y recursos correspondientes al primer período de Ciencias Naturales para grado sexto.
+Recursos, ejercicios interactivos, actividades de práctica, evaluaciones y material de apoyo para el aprendizaje de las Ciencias Naturales en grado octavo.

@@ -1,3 +1,3 @@
-# Período 3
+# Periodo 3
 
 Guías de aprendizaje, proyectos, actividades y recursos correspondientes al tercer período de Tecnología para grado sexto.

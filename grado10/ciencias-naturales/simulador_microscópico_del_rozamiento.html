@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Microscópico del Rozamiento</title>
+
+<style>
+:root{
+    --azul:#2563eb;
+    --verde:#16a34a;
+    --naranja:#f97316;
+    --rojo:#dc2626;
+    --gris:#64748b;
+    --fondo:#f8fafc;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:var(--fondo);
+    color:#1e293b;
+    padding:20px;
+}
+
+.container{
+    max-width:1300px;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    color:var(--azul);
+    margin-bottom:10px;
+}
+
+.subtitulo{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.panel{
+    display:grid;
+    grid-template-columns:1fr 320px;
+    gap:20px;
+}
+
+@media(max-width:1000px){
+    .panel{
+        grid-template-columns:1fr;
+    }
+}
+
+.card{
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+h2{
+    margin-bottom:12px;
+    color:#0f172a;
+}
+
+canvas{
+    width:100%;
+    display:block;
+    border-radius:12px;
+    background:white;
+}
+
+#macroCanvas{
+    border:2px solid #cbd5e1;
+}
+
+#microCanvas{
+    border:2px solid #cbd5e1;
+}
+
+.control{
+    margin-bottom:18px;
+}
+
+label{
+    font-weight:600;
+    display:block;
+    margin-bottom:6px;
+}
+
+input[type=range]{
+    width:100%;
+}
+
+select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+}
+
+.valor{
+    color:var(--azul);
+    font-weight:bold;
+}
+
+.indicador{
+    background:#eef2ff;
+    border-left:6px solid var(--azul);
+    padding:12px;
+    margin-bottom:12px;
+    border-radius:8px;
+}
+
+.estado{
+    font-size:1.1rem;
+    font-weight:bold;
+}
+
+.msg{
+    min-height:80px;
+    background:#f8fafc;
+    border-radius:10px;
+    padding:12px;
+    margin-top:15px;
+    line-height:1.5;
+}
+
+.reposo{
+    border-left:6px solid var(--azul);
+}
+
+.limite{
+    border-left:6px solid var(--naranja);
+}
+
+.mov{
+    border-left:6px solid var(--verde);
+}
+
+.btn{
+    width:100%;
+    border:none;
+    background:var(--azul);
+    color:white;
+    padding:12px;
+    border-radius:10px;
+    font-size:1rem;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.btn:hover{
+    transform:scale(1.03);
+}
+
+.zoomText{
+    text-align:center;
+    margin-top:8px;
+    font-size:.95rem;
+    color:var(--gris);
+}
+
+.legend{
+    margin-top:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.badge{
+    background:#e2e8f0;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:.85rem;
+}
+
+.animPulse{
+    animation:pulse .4s;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.05)}
+    100%{transform:scale(1)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔬 Simulador Microscópico del Rozamiento</h1>
+<p class="subtitulo">
+Visualiza cómo las rugosidades microscópicas generan la fuerza de fricción.
+</p>
+
+<div class="panel">
+
+<div>
+
+<div class="card">
+<h2>Vista Macroscópica</h2>
+<canvas id="macroCanvas" width="850" height="250"></canvas>
+
+<div class="legend">
+<span class="badge">➡️ Fuerza aplicada</span>
+<span class="badge">⬅️ Fuerza de rozamiento</span>
+<span class="badge">📦 Bloque</span>
+</div>
+</div>
+
+<br>
+
+<div class="card">
+<h2>Zoom Microscópico</h2>
+<canvas id="microCanvas" width="850" height="300"></canvas>
+<div class="zoomText">
+Observa cómo las rugosidades se enganchan entre sí.
+</div>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Controles</h2>
+
+<div class="control">
+<label>Fuerza aplicada:
+<span id="forceValue" class="valor">50 N</span>
+</label>
+<input type="range" id="force" min="0" max="400" value="50">
+</div>
+
+<div class="control">
+<label>Peso del bloque:
+<span id="massValue" class="valor">40 kg</span>
+</label>
+<input type="range" id="mass" min="10" max="100" value="40">
+</div>
+
+<div class="control">
+<label>Rugosidad de la superficie</label>
+<select id="surface">
+<option value="0.2">Muy lisa</option>
+<option value="0.4">Lisa</option>
+<option value="0.6" selected>Rugosa</option>
+<option value="0.9">Muy rugosa</option>
+</select>
+</div>
+
+<button class="btn" id="zoomBtn">
+🔍 Ver explicación microscópica
+</button>
+
+<br><br>
+
+<h2>Indicadores</h2>
+
+<div class="indicador">
+Fuerza Normal:
+<strong id="normal">400 N</strong>
+</div>
+
+<div class="indicador">
+Fricción estática máxima:
+<strong id="fricMax">240 N</strong>
+</div>
+
+<div class="indicador">
+Estado:
+<div class="estado" id="estado">
+REPOSO
+</div>
+</div>
+
+<div id="mensaje" class="msg reposo">
+Las rugosidades permanecen enganchadas. La fricción estática equilibra la fuerza aplicada.
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const macro = document.getElementById("macroCanvas");
+const mctx = macro.getContext("2d");
+
+const micro = document.getElementById("microCanvas");
+const mic = micro.getContext("2d");
+
+const forceSlider = document.getElementById("force");
+const massSlider = document.getElementById("mass");
+const surfaceSelect = document.getElementById("surface");
+
+const forceValue = document.getElementById("forceValue");
+const massValue = document.getElementById("massValue");
+
+const normalText = document.getElementById("normal");
+const fricText = document.getElementById("fricMax");
+const estadoText = document.getElementById("estado");
+const mensaje = document.getElementById("mensaje");
+
+let shake=0;
+
+function playTone(freq,duration){
+
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+const osc = ctx.createOscillator();
+const gain = ctx.createGain();
+
+osc.frequency.value=freq;
+
+osc.connect(gain);
+gain.connect(ctx.destination);
+
+gain.gain.value=0.05;
+
+osc.start();
+
+setTimeout(()=>{
+osc.stop();
+ctx.close();
+},duration);
+
+}
+
+function update(){
+
+const F = Number(forceSlider.value);
+const m = Number(massSlider.value);
+const rough = Number(surfaceSelect.value);
+
+forceValue.textContent = F + " N";
+massValue.textContent = m + " kg";
+
+const N = m*10;
+const Frmax = Math.round(rough*N);
+
+normalText.textContent = N + " N";
+fricText.textContent = Frmax + " N";
+
+let estado="REPOSO";
+
+if(F < Frmax*0.8){
+
+estado="REPOSO";
+
+mensaje.className="msg reposo";
+
+mensaje.innerHTML=
+"Las rugosidades permanecen completamente enganchadas.<br><br>La fricción estática iguala la fuerza aplicada y evita el movimiento.";
+
+}
+
+else if(F < Frmax){
+
+estado="AL LÍMITE";
+
+mensaje.className="msg limite";
+
+mensaje.innerHTML=
+"⚠️ Algunas rugosidades comienzan a deformarse.<br><br>El sistema está cerca del deslizamiento.";
+
+shake=3;
+
+}
+
+else{
+
+estado="DESLIZANDO";
+
+mensaje.className="msg mov";
+
+mensaje.innerHTML=
+"✅ Se venció el rozamiento estático.<br><br>Las superficies ya no están profundamente encajadas y ahora solo rozan sus puntas.";
+
+}
+
+estadoText.textContent=estado;
+
+drawMacro(F,Frmax,estado);
+drawMicro(F,Frmax,rough);
+
+}
+
+function drawArrow(ctx,x,y,len,color,label){
+
+ctx.strokeStyle=color;
+ctx.fillStyle=color;
+ctx.lineWidth=4;
+
+ctx.beginPath();
+ctx.moveTo(x,y);
+ctx.lineTo(x+len,y);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(x+len,y);
+ctx.lineTo(x+len-15,y-8);
+ctx.lineTo(x+len-15,y+8);
+ctx.fill();
+
+ctx.font="16px Arial";
+ctx.fillText(label,x+len/2-20,y-10);
+
+}
+
+function drawMacro(F,Frmax,estado){
+
+mctx.clearRect(0,0,macro.width,macro.height);
+
+mctx.fillStyle="#94a3b8";
+mctx.fillRect(0,180,850,12);
+
+let x=280;
+
+if(estado==="AL LÍMITE"){
+x += Math.sin(Date.now()/50)*3;
+}
+
+if(estado==="DESLIZANDO"){
+x += (F-Frmax)/4;
+if(x>600)x=600;
+}
+
+mctx.fillStyle="#3b82f6";
+mctx.fillRect(x,100,140,80);
+
+mctx.fillStyle="white";
+mctx.font="20px Arial";
+mctx.fillText("Bloque",x+35,145);
+
+drawArrow(mctx,x+140,125,100,"green","F");
+
+drawArrow(mctx,x,160,-100,"red","Fr");
+
+}
+
+function drawMicro(F,Frmax,rough){
+
+mic.clearRect(0,0,micro.width,micro.height);
+
+const moving = F>=Frmax;
+
+let compression = Number(massSlider.value)/100*25;
+
+let offset = 0;
+
+if(moving){
+
+offset = (F-Frmax)*0.3;
+if(offset>90) offset=90;
+
+}
+
+mic.fillStyle="#111827";
+mic.font="20px Arial";
+mic.fillText("SUPERFICIE DEL BLOQUE",280,40);
+
+mic.fillText("SUPERFICIE DEL SUELO",290,280);
+
+for(let i=0;i<17;i++){
+
+let x = 50 + i*45;
+
+let h = 20 + rough*30;
+
+mic.fillStyle="#3b82f6";
+
+mic.beginPath();
+mic.moveTo(x-offset,100+compression);
+mic.lineTo(x+20-offset,100+compression+h);
+mic.lineTo(x+40-offset,100+compression);
+mic.closePath();
+mic.fill();
+
+}
+
+for(let i=0;i<17;i++){
+
+let x=50+i*45;
+
+let h=20+rough*30;
+
+mic.fillStyle="#475569";
+
+mic.beginPath();
+mic.moveTo(x,220);
+mic.lineTo(x+20,220-h);
+mic.lineTo(x+40,220);
+mic.closePath();
+mic.fill();
+
+}
+
+if(!moving){
+
+mic.strokeStyle="orange";
+
+for(let i=0;i<17;i++){
+
+let x=70+i*45-offset;
+
+mic.beginPath();
+mic.moveTo(x,150+compression);
+mic.lineTo(x,190);
+mic.stroke();
+
+}
+
+}
+
+if(moving){
+
+for(let i=0;i<25;i++){
+
+let px=Math.random()*850;
+let py=150+Math.random()*30;
+
+mic.fillStyle="#f97316";
+mic.beginPath();
+mic.arc(px,py,2,0,Math.PI*2);
+mic.fill();
+
+}
+
+}
+
+}
+
+forceSlider.addEventListener("input",()=>{
+
+update();
+
+});
+
+massSlider.addEventListener("input",()=>{
+
+update();
+
+});
+
+surfaceSelect.addEventListener("change",()=>{
+
+update();
+
+});
+
+document.getElementById("zoomBtn").addEventListener("click",()=>{
+
+micro.classList.add("animPulse");
+
+playTone(600,200);
+
+setTimeout(()=>{
+micro.classList.remove("animPulse");
+},500);
+
+alert(
+"Las superficies parecen lisas a simple vista.\n\nPero al observarlas con aumento se descubren rugosidades microscópicas que se enganchan entre sí.\n\nEse enganche es el origen físico de la fuerza de rozamiento."
+);
+
+});
+
+update();
+
+</script>
+
+</body>
+</html>

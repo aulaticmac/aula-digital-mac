@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificación de los Números Reales - Práctica 2</title>
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --color-reales: #334155;
+            --color-irracionales: #fef2f2;
+            --border-irracionales: #ef4444;
+            --color-racionales: #fffbeb;
+            --border-racionales: #f59e0b;
+            --color-enteros: #eff6ff;
+            --border-enteros: #3b82f6;
+            --color-naturales: #f0fdf4;
+            --border-naturales: #22c55e;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: #0f172a;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        p.instructions {
+            font-size: 0.95rem;
+            color: #475569;
+            background-color: #e2e8f0;
+            padding: 10px 18px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* Banco de Fichas */
+        .source-container {
+            width: 100%;
+            max-width: 1100px;
+            background: #ffffff;
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .source-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        /* Fichas Numéricas */
+        .number-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: grab;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s, border-color 0.2s;
+            touch-action: none;
+            z-index: 10;
+        }
+
+        .number-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+        }
+
+        .number-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        /* Validaciones */
+        .number-card.correct {
+            background-color: #dcfce7 !important;
+            border-color: #16a34a !important;
+            color: #15803d !important;
+        }
+
+        .number-card.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #b91c1c !important;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Diagrama de Conjuntos (Reales) */
+        .board-reales {
+            width: 100%;
+            max-width: 1100px;
+            border: 3px solid var(--color-reales);
+            border-radius: 16px;
+            background-color: #ffffff;
+            padding: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .reales-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-reales);
+            margin-bottom: 12px;
+        }
+
+        .sets-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .sets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Zonas de Soltado */
+        .drop-zone {
+            border-radius: 12px;
+            padding: 12px;
+            transition: background-color 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drop-zone.drag-over {
+            filter: brightness(0.95);
+            outline: 2px dashed #000;
+        }
+
+        .zone-label {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            pointer-events: none;
+        }
+
+        .zone-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-content: flex-start;
+            flex-grow: 1;
+            min-height: 60px;
+        }
+
+        /* Conjuntos Específicos */
+        .zone-irracionales {
+            background-color: var(--color-irracionales);
+            border: 2px solid var(--border-irracionales);
+        }
+        .zone-irracionales > .zone-label { color: #991b1b; }
+
+        .zone-racionales {
+            background-color: var(--color-racionales);
+            border: 2px solid var(--border-racionales);
+        }
+        .zone-racionales > .zone-label { color: #92400e; }
+
+        .zone-enteros {
+            background-color: var(--color-enteros);
+            border: 2px solid var(--border-enteros);
+            margin-top: 8px;
+        }
+        .zone-enteros > .zone-label { color: #1e40af; }
+
+        .zone-naturales {
+            background-color: var(--color-naturales);
+            border: 2px solid var(--border-naturales);
+            margin-top: 8px;
+        }
+        .zone-naturales > .zone-label { color: #166534; }
+
+        /* Controles */
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-validate { background-color: #2563eb; color: #ffffff; }
+        .btn-validate:hover { background-color: #1d4ed8; }
+
+        .btn-reset { background-color: #64748b; color: #ffffff; }
+        .btn-reset:hover { background-color: #475569; }
+
+        /* Panel de Resultado */
+        #feedbackPanel {
+            margin-top: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            display: none;
+            max-width: 650px;
+        }
+
+        #feedbackPanel.success {
+            background-color: #dcfce7;
+            border: 2px solid #22c55e;
+            color: #14532d;
+            display: block;
+        }
+
+        #feedbackPanel.info {
+            background-color: #e0f2fe;
+            border: 2px solid #0284c7;
+            color: #0c4a6e;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Clasificación de los Números Reales</h1>
+        <p class="instructions">Arrastra cada número de la lista y suéltalo en el conjunto numérico más específico al que pertenece.</p>
+    </header>
+
+    <!-- Banco de Fichas -->
+    <section class="source-container">
+        <div class="source-title">Fichas Disponibles (16 Números)</div>
+        <div class="cards-wrapper" id="sourceWrapper"></div>
+    </section>
+
+    <!-- Diagrama de Venn -->
+    <main class="board-reales">
+        <div class="reales-title">Números Reales (ℝ)</div>
+        
+        <div class="sets-grid">
+            <!-- Columna Irracionales -->
+            <div class="drop-zone zone-irracionales" data-set="I">
+                <div class="zone-label">Irracionales (I)</div>
+                <div class="zone-content"></div>
+            </div>
+
+            <!-- Columna Racionales y Anidados -->
+            <div class="drop-zone zone-racionales" data-set="Q">
+                <div class="zone-label">Racionales (Q)</div>
+                <div class="zone-content"></div>
+
+                <!-- Anidado: Enteros -->
+                <div class="drop-zone zone-enteros" data-set="Z">
+                    <div class="zone-label">Enteros (Z)</div>
+                    <div class="zone-content"></div>
+
+                    <!-- Anidado: Naturales -->
+                    <div class="drop-zone zone-naturales" data-set="N">
+                        <div class="zone-label">Naturales (N)</div>
+                        <div class="zone-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botones de Control -->
+    <div class="controls">
+        <button class="btn btn-validate" id="btnValidate">Validar Respuestas</button>
+        <button class="btn btn-reset" id="btnReset">Reiniciar</button>
+    </div>
+
+    <!-- Feedback -->
+    <div id="feedbackPanel"></div>
+
+    <script>
+        // Nuevos ejercicios de números reales
+        const numberData = [
+            { id: 'm1', label: '√81', correctSet: 'N' },          // = 9 (Natural)
+            { id: 'm2', label: '-15/3', correctSet: 'Z' },        // = -5 (Entero)
+            { id: 'm3', label: '0,333...', correctSet: 'Q' },     // Decimal periódico (Racional)
+            { id: 'm4', label: 'π', correctSet: 'I' },            // Pi (Irracional)
+            { id: 'm5', label: '0', correctSet: 'Z' },            // Cero (Entero)
+            { id: 'm6', label: '-√49', correctSet: 'Z' },         // = -7 (Entero)
+            { id: 'm7', label: 'ϕ (1,618...)', correctSet: 'I' }, // Número Áureo (Irracional)
+            { id: 'm8', label: '84', correctSet: 'N' },           // Natural
+            { id: 'm9', label: '-3,25', correctSet: 'Q' },        // Decimal exacto negativo (Racional)
+            { id: 'm10', label: '7/2', correctSet: 'Q' },         // Fracción (Racional)
+            { id: 'm11', label: 'e (2,718...)', correctSet: 'I' },// Número de Euler (Irracional)
+            { id: 'm12', label: '100', correctSet: 'N' },         // Natural
+            { id: 'm13', label: '√2', correctSet: 'I' },          // Raíz no exacta (Irracional)
+            { id: 'm14', label: '-12', correctSet: 'Z' },         // Entero negativo
+            { id: 'm15', label: '0,121121112...', correctSet: 'I' }, // Decimal no periódico infinito (Irracional)
+            { id: 'm16', label: '-4/5', correctSet: 'Q' }         // Fracción negativa (Racional)
+        ];
+
+        const sourceWrapper = document.getElementById('sourceWrapper');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        const btnValidate = document.getElementById('btnValidate');
+        const btnReset = document.getElementById('btnReset');
+        const feedbackPanel = document.getElementById('feedbackPanel');
+
+        let draggedElement = null;
+
+        function initApp() {
+            sourceWrapper.innerHTML = '';
+            feedbackPanel.className = '';
+            feedbackPanel.style.display = 'none';
+
+            dropZones.forEach(zone => {
+                zone.querySelector('.zone-content').innerHTML = '';
+            });
+
+            // Desordenar fichas aleatoriamente
+            const shuffled = [...numberData].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'number-card';
+                card.draggable = true;
+                card.innerText = item.label;
+                card.dataset.id = item.id;
+                card.dataset.correctSet = item.correctSet;
+
+                // Drag & Drop Ratón
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+
+                // Touch para Móviles/Tabletas
+                card.addEventListener('touchstart', handleTouchStart, { passive: false });
+                card.addEventListener('touchmove', handleTouchMove, { passive: false });
+                card.addEventListener('touchend', handleTouchEnd);
+
+                sourceWrapper.appendChild(card);
+            });
+        }
+
+        // Eventos Drag (Escritorio)
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            clearCardStyles(this);
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('drag-over');
+
+                if (draggedElement) {
+                    zone.querySelector('.zone-content').appendChild(draggedElement);
+                    clearCardStyles(draggedElement);
+                }
+            });
+        });
+
+        sourceWrapper.addEventListener('dragover', e => e.preventDefault());
+        sourceWrapper.addEventListener('drop', e => {
+            e.preventDefault();
+            if (draggedElement) {
+                sourceWrapper.appendChild(draggedElement);
+                clearCardStyles(draggedElement);
+            }
+        });
+
+        // Eventos Touch (Móviles)
+        let touchOffset = { x: 0, y: 0 };
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            draggedElement = this;
+            clearCardStyles(this);
+
+            const touch = e.touches[0];
+            const rect = this.getBoundingClientRect();
+            touchOffset.x = touch.clientX - rect.left;
+            touchOffset.y = touch.clientY - rect.top;
+
+            this.style.position = 'fixed';
+            this.style.zIndex = '1000';
+            moveAt(touch.clientX, touch.clientY);
+            this.classList.add('dragging');
+        }
+
+        function handleTouchMove(e) {
+            if (!draggedElement) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            moveAt(touch.clientX, touch.clientY);
+
+            this.style.display = 'none';
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            this.style.display = 'block';
+
+            dropZones.forEach(z => z.classList.remove('drag-over'));
+            if (elemBelow) {
+                const zone = elemBelow.closest('.drop-zone');
+                if (zone) zone.classList.add('drag-over');
+            }
+        }
+
+        function moveAt(pageX, pageY) {
+            draggedElement.style.left = pageX - touchOffset.x + 'px';
+            draggedElement.style.top = pageY - touchOffset.y + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            if (!draggedElement) return;
+            draggedElement.classList.remove('dragging');
+
+            const touch = e.changedTouches[0];
+            draggedElement.style.display = 'none';
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            draggedElement.style.display = 'block';
+
+            draggedElement.style.position = '';
+            draggedElement.style.left = '';
+            draggedElement.style.top = '';
+            draggedElement.style.zIndex = '';
+
+            dropZones.forEach(z => z.classList.remove('drag-over'));
+
+            if (elemBelow) {
+                const targetZone = elemBelow.closest('.drop-zone');
+                if (targetZone) {
+                    targetZone.querySelector('.zone-content').appendChild(draggedElement);
+                } else if (elemBelow.closest('.source-container')) {
+                    sourceWrapper.appendChild(draggedElement);
+                }
+            }
+
+            draggedElement = null;
+        }
+
+        function clearCardStyles(card) {
+            card.classList.remove('correct', 'incorrect');
+            feedbackPanel.style.display = 'none';
+        }
+
+        // Validación
+        btnValidate.addEventListener('click', () => {
+            const allCards = document.querySelectorAll('.number-card');
+            let correctCount = 0;
+            let unplacedCount = 0;
+
+            allCards.forEach(card => {
+                const parentZone = card.closest('.drop-zone');
+                
+                if (!parentZone) {
+                    unplacedCount++;
+                    card.classList.remove('correct', 'incorrect');
+                } else {
+                    const currentSet = parentZone.dataset.set;
+                    const correctSet = card.dataset.correctSet;
+
+                    if (currentSet === correctSet) {
+                        card.classList.add('correct');
+                        card.classList.remove('incorrect');
+                        correctCount++;
+                    } else {
+                        card.classList.add('incorrect');
+                        card.classList.remove('correct');
+                    }
+                }
+            });
+
+            const total = numberData.length;
+            if (correctCount === total) {
+                feedbackPanel.className = 'success';
+                feedbackPanel.innerText = `¡Excelente! Has clasificado los ${total} números correctamente (${correctCount}/${total}). Muestras un gran dominio de la simplificación y jerarquía de los números reales.`;
+            } else {
+                feedbackPanel.className = 'info';
+                let msg = `Puntaje: ${correctCount} de ${total} correctos. `;
+                if (unplacedCount > 0) {
+                    msg += `Tienes ${unplacedCount} ficha(s) sin ubicar. `;
+                }
+                msg += "Recuerda simplificar las expresiones (como √81 o -15/3) antes de elegir su conjunto más específico.";
+                feedbackPanel.innerText = msg;
+            }
+        });
+
+        btnReset.addEventListener('click', initApp);
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

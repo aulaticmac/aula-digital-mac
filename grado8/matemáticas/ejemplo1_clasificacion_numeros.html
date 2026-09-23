@@ -1,0 +1,592 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificación de los Números Reales</title>
+    <style>
+        :root {
+            --bg-main: #f1f5f9;
+            --color-reales: #475569;
+            --color-irracionales: #fef2f2;
+            --border-irracionales: #ef4444;
+            --color-racionales: #fffbeeb;
+            --border-racionales: #f59e0b;
+            --color-enteros: #eff6ff;
+            --border-enteros: #3b82f6;
+            --color-naturales: #f0fdf4;
+            --border-naturales: #22c55e;
+            --card-bg: #ffffff;
+            --card-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: #1e293b;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            max-width: 900px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        p.instructions {
+            font-size: 1rem;
+            color: #475569;
+            background-color: #e2e8f0;
+            padding: 10px 16px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* Zona de Fichas (Origen) */
+        .source-container {
+            width: 100%;
+            max-width: 1100px;
+            background: #ffffff;
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .source-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .cards-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            min-height: 50px;
+        }
+
+        /* Fichas Arrastrables */
+        .number-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: grab;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s, border-color 0.2s;
+            touch-action: none;
+            z-index: 10;
+        }
+
+        .number-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+        }
+
+        .number-card.dragging {
+            opacity: 0.6;
+            cursor: grabbing;
+        }
+
+        /* Estados de Validación */
+        .number-card.correct {
+            background-color: #dcfce7 !important;
+            border-color: #16a34a !important;
+            color: #15803d !important;
+        }
+
+        .number-card.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #b91c1c !important;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Tablero de Conjuntos (Reales) */
+        .board-reales {
+            width: 100%;
+            max-width: 1100px;
+            border: 3px solid var(--color-reales);
+            border-radius: 16px;
+            background-color: #ffffff;
+            padding: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .reales-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-reales);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sets-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .sets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Contenedores / Dropzones */
+        .drop-zone {
+            border-radius: 12px;
+            padding: 12px;
+            transition: background-color 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .drop-zone.drag-over {
+            filter: brightness(0.95);
+            outline: 2px dashed #000;
+        }
+
+        .zone-label {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            pointer-events: none;
+        }
+
+        .zone-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-content: flex-start;
+            flex-grow: 1;
+            min-height: 60px;
+        }
+
+        /* Conjunto Irracionales (I) */
+        .zone-irracionales {
+            background-color: var(--color-irracionales);
+            border: 2px solid var(--border-irracionales);
+        }
+        .zone-irracionales .zone-label { color: #991b1b; }
+
+        /* Conjunto Racionales (Q) - Anidado */
+        .zone-racionales {
+            background-color: var(--color-racionales);
+            border: 2px solid var(--border-racionales);
+        }
+        .zone-racionales > .zone-label { color: #92400e; }
+
+        /* Conjunto Enteros (Z) */
+        .zone-enteros {
+            background-color: var(--color-enteros);
+            border: 2px solid var(--border-enteros);
+            margin-top: 8px;
+        }
+        .zone-enteros > .zone-label { color: #1e40af; }
+
+        /* Conjunto Naturales (N) */
+        .zone-naturales {
+            background-color: var(--color-naturales);
+            border: 2px solid var(--border-naturales);
+            margin-top: 8px;
+        }
+        .zone-naturales > .zone-label { color: #166534; }
+
+        /* Controles y Panel Inferior */
+        .controls {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-validate {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        .btn-validate:hover { background-color: #1d4ed8; }
+
+        .btn-reset {
+            background-color: #64748b;
+            color: #ffffff;
+        }
+        .btn-reset:hover { background-color: #475569; }
+
+        /* Panel de Feedback */
+        #feedbackPanel {
+            margin-top: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+            display: none;
+            max-width: 600px;
+        }
+
+        #feedbackPanel.success {
+            background-color: #dcfce7;
+            border: 2px solid #22c55e;
+            color: #14532d;
+            display: block;
+        }
+
+        #feedbackPanel.info {
+            background-color: #e0f2fe;
+            border: 2px solid #0284c7;
+            color: #0c4a6e;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Clasificación de los Números Reales</h1>
+        <p class="instructions">Arrastra cada número de la lista y suéltalo en el conjunto numérico más específico al que pertenece.</p>
+    </header>
+
+    <!-- Zona de Origen -->
+    <section class="source-container">
+        <div class="source-title">Fichas Disponibles</div>
+        <div class="cards-wrapper" id="sourceWrapper"></div>
+    </section>
+
+    <!-- Diagrama de Venn (Reales) -->
+    <main class="board-reales">
+        <div class="reales-title">
+            <span>Números Reales (ℝ)</span>
+        </div>
+        
+        <div class="sets-grid">
+            <!-- Columna Izquierda: Irracionales -->
+            <div class="drop-zone zone-irracionales" data-set="I">
+                <div class="zone-label">Irracionales (I)</div>
+                <div class="zone-content"></div>
+            </div>
+
+            <!-- Columna Derecha: Racionales y anidados -->
+            <div class="drop-zone zone-racionales" data-set="Q">
+                <div class="zone-label">Racionales (Q)</div>
+                <div class="zone-content"></div>
+
+                <!-- Anidado: Enteros -->
+                <div class="drop-zone zone-enteros" data-set="Z">
+                    <div class="zone-label">Enteros (Z)</div>
+                    <div class="zone-content"></div>
+
+                    <!-- Anidado: Naturales -->
+                    <div class="drop-zone zone-naturales" data-set="N">
+                        <div class="zone-label">Naturales (N)</div>
+                        <div class="zone-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Botones de Acción -->
+    <div class="controls">
+        <button class="btn btn-validate" id="btnValidate">Validar Respuestas</button>
+        <button class="btn btn-reset" id="btnReset">Reiniciar</button>
+    </div>
+
+    <!-- Mensaje de Feedback -->
+    <div id="feedbackPanel"></div>
+
+    <script>
+        // Datos de las fichas y su conjunto MÁS ESPECÍFICO
+        const numberData = [
+            { id: 'n1', label: '3,1416...', correctSet: 'I' },
+            { id: 'n2', label: '√36', correctSet: 'N' },
+            { id: 'n3', label: '0,78', correctSet: 'Q' },
+            { id: 'n4', label: '2,718281...', correctSet: 'I' },
+            { id: 'n5', label: '√5', correctSet: 'I' },
+            { id: 'n6', label: '1,6180...', correctSet: 'I' },
+            { id: 'n7', label: '124', correctSet: 'N' },
+            { id: 'n8', label: '45,387979', correctSet: 'Q' },
+            { id: 'n9', label: '-63', correctSet: 'Z' },
+            { id: 'n10', label: '-8', correctSet: 'Z' },
+            { id: 'n11', label: '5/9', correctSet: 'Q' },
+            { id: 'n12', label: '-0,56', correctSet: 'Q' },
+            { id: 'n13', label: '14,15368...', correctSet: 'I' },
+            { id: 'n14', label: '45', correctSet: 'N' }
+        ];
+
+        const sourceWrapper = document.getElementById('sourceWrapper');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        const btnValidate = document.getElementById('btnValidate');
+        const btnReset = document.getElementById('btnReset');
+        const feedbackPanel = document.getElementById('feedbackPanel');
+
+        let draggedElement = null;
+
+        // Inicialización
+        function initApp() {
+            sourceWrapper.innerHTML = '';
+            feedbackPanel.className = '';
+            feedbackPanel.style.display = 'none';
+
+            // Limpiar zonas de soltado
+            dropZones.forEach(zone => {
+                const content = zone.querySelector('.zone-content');
+                content.innerHTML = '';
+            });
+
+            // Desordenar fichas aleatoriamente
+            const shuffled = [...numberData].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'number-card';
+                card.draggable = true;
+                card.innerText = item.label;
+                card.dataset.id = item.id;
+                card.dataset.correctSet = item.correctSet;
+
+                // Eventos Drag and Drop estándar (HTML5)
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+
+                // Eventos Touch (Soporte Móvil/Tableta)
+                card.addEventListener('touchstart', handleTouchStart, { passive: false });
+                card.addEventListener('touchmove', handleTouchMove, { passive: false });
+                card.addEventListener('touchend', handleTouchEnd);
+
+                sourceWrapper.appendChild(card);
+            });
+        }
+
+        // --- MANEJADORES DRAG & DROP ESTÁNDAR ---
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            clearCardStyles(this);
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        // Configurar Zonas de Soltado (Drop Zones)
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => {
+                e.preventDefault();
+                e.stopPropagation(); // Evitar activación de contenedores padres (anidados)
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                zone.classList.remove('drag-over');
+
+                if (draggedElement) {
+                    const contentArea = zone.querySelector('.zone-content');
+                    contentArea.appendChild(draggedElement);
+                    clearCardStyles(draggedElement);
+                }
+            });
+        });
+
+        // Permitir regresar fichas a la zona de origen
+        sourceWrapper.addEventListener('dragover', e => {
+            e.preventDefault();
+        });
+
+        sourceWrapper.addEventListener('drop', e => {
+            e.preventDefault();
+            if (draggedElement) {
+                sourceWrapper.appendChild(draggedElement);
+                clearCardStyles(draggedElement);
+            }
+        });
+
+        // --- SOPORTE PARA EVENTOS TÁCTILES (TOUCH) ---
+        let touchOffset = { x: 0, y: 0 };
+        let currentTouchTarget = null;
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            draggedElement = this;
+            clearCardStyles(this);
+
+            const touch = e.touches[0];
+            const rect = this.getBoundingClientRect();
+            touchOffset.x = touch.clientX - rect.left;
+            touchOffset.y = touch.clientY - rect.top;
+
+            this.style.position = 'fixed';
+            this.style.zIndex = '1000';
+            moveAt(touch.clientX, touch.clientY);
+            this.classList.add('dragging');
+        }
+
+        function handleTouchMove(e) {
+            if (!draggedElement) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            moveAt(touch.clientX, touch.clientY);
+
+            // Resaltar zona bajo el dedo
+            this.style.display = 'none';
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            this.style.display = 'block';
+
+            dropZones.forEach(z => z.classList.remove('drag-over'));
+            if (elemBelow) {
+                const zone = elemBelow.closest('.drop-zone');
+                if (zone) zone.classList.add('drag-over');
+            }
+        }
+
+        function moveAt(pageX, pageY) {
+            draggedElement.style.left = pageX - touchOffset.x + 'px';
+            draggedElement.style.top = pageY - touchOffset.y + 'px';
+        }
+
+        function handleTouchEnd(e) {
+            if (!draggedElement) return;
+            draggedElement.classList.remove('dragging');
+
+            const touch = e.changedTouches[0];
+            draggedElement.style.display = 'none';
+            const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            draggedElement.style.display = 'block';
+
+            // Restaurar posición inline
+            draggedElement.style.position = '';
+            draggedElement.style.left = '';
+            draggedElement.style.top = '';
+            draggedElement.style.zIndex = '';
+
+            dropZones.forEach(z => z.classList.remove('drag-over'));
+
+            if (elemBelow) {
+                const targetZone = elemBelow.closest('.drop-zone');
+                if (targetZone) {
+                    targetZone.querySelector('.zone-content').appendChild(draggedElement);
+                } else if (elemBelow.closest('.source-container')) {
+                    sourceWrapper.appendChild(draggedElement);
+                }
+            }
+
+            draggedElement = null;
+        }
+
+        // --- LIMPIEZA DE ESTILOS ---
+        function clearCardStyles(card) {
+            card.classList.remove('correct', 'incorrect');
+            feedbackPanel.style.display = 'none';
+        }
+
+        // --- VALIDACIÓN DE RESPUESTAS ---
+        btnValidate.addEventListener('click', () => {
+            const allCards = document.querySelectorAll('.number-card');
+            let correctCount = 0;
+            let unplacedCount = 0;
+
+            allCards.forEach(card => {
+                const parentZone = card.closest('.drop-zone');
+                
+                if (!parentZone) {
+                    // La ficha está en el origen
+                    unplacedCount++;
+                    card.classList.remove('correct', 'incorrect');
+                } else {
+                    const currentSet = parentZone.dataset.set;
+                    const correctSet = card.dataset.correctSet;
+
+                    if (currentSet === correctSet) {
+                        card.classList.add('correct');
+                        card.classList.remove('incorrect');
+                        correctCount++;
+                    } else {
+                        card.classList.add('incorrect');
+                        card.classList.remove('correct');
+                    }
+                }
+            });
+
+            // Mostrar Resultados
+            const total = numberData.length;
+            if (correctCount === total) {
+                feedbackPanel.className = 'success';
+                feedbackPanel.innerText = `¡Excelente trabajo! Has clasificado los ${total} números correctamente (${correctCount}/${total}). Dominas muy bien las relaciones de inclusión de los conjuntos numéricos.`;
+            } else {
+                feedbackPanel.className = 'info';
+                let msg = `Puntaje: ${correctCount} de ${total} correctos. `;
+                if (unplacedCount > 0) {
+                    msg += `Aún tienes ${unplacedCount} ficha(s) sin ubicar. `;
+                }
+                msg += "Revisa las fichas marcadas en rojo y ajústalas al conjunto más específico correspondiente.";
+                feedbackPanel.innerText = msg;
+            }
+        });
+
+        // --- REINICIAR APLICACIÓN ---
+        btnReset.addEventListener('click', initApp);
+
+        // Inicializar al cargar
+        window.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

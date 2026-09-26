@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación: Actividad 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; }
+        .input-coef { width: 40px; text-align: center; border: 2px solid #cbd5e1; border-radius: 4px; font-weight: bold; color: #1e293b; outline: none; }
+        .input-coef:focus { border-color: #4f46e5; }
+        .correct { border-color: #10b981 !important; background-color: #d1fae5; }
+        .incorrect { border-color: #ef4444 !important; background-color: #fee2e2; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-lg border border-slate-200">
+        <h2 class="text-2xl font-extrabold text-slate-800 mb-2">Actividad 1: Balanceo y Clasificación</h2>
+        <p class="text-slate-600 mb-8">Verifica que las ecuaciones estén balanceadas (aplica el método del tanteo en los cuadros) y selecciona el tipo de reacción.</p>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-700">
+                        <th class="p-4 rounded-tl-lg">Ecuación a Balancear</th>
+                        <th class="p-4 rounded-tr-lg">Tipo de Reacción</th>
+                    </tr>
+                </thead>
+                <tbody id="quiz-body" class="divide-y divide-slate-100">
+                    <!-- Fila 1 -->
+                    <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> SO<sub>3(g)</sub> + 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> H<sub>2</sub>O<sub>(l)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> H<sub>2</sub>SO<sub>4(ac)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none focus:border-indigo-500 type-select" data-ans="sintesis">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Fila 2 -->
+                    <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="2"> HCl<sub>(ac)</sub> + 
+                            <input type="text" class="input-coef" data-ans="2"> K<sub>(s)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> H<sub>2(g)</sub> + 
+                            <input type="text" class="input-coef" data-ans="2"> KCl<sub>(ac)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none type-select" data-ans="simple">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Fila 3 -->
+                    <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> CaCO<sub>3(s)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> CaO<sub>(s)</sub> + 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> CO<sub>2(g)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none type-select" data-ans="descomposicion">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                     <!-- Fila 4 -->
+                     <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> P<sub>2</sub>O<sub>5(s)</sub> + 
+                            <input type="text" class="input-coef" data-ans="3"> H<sub>2</sub>O<sub>(l)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="2"> H<sub>3</sub>PO<sub>4(ac)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none type-select" data-ans="sintesis">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Fila 5 -->
+                    <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> Fe<sub>(s)</sub> + 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> CuSO<sub>4(ac)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> FeSO<sub>4(ac)</sub> + 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> Cu<sub>(s)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none type-select" data-ans="simple">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Fila 6 -->
+                    <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> AgNO<sub>3(ac)</sub> + 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> NaCl<sub>(ac)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> AgCl<sub>(s)</sub> + 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> NaNO<sub>3(ac)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none type-select" data-ans="doble">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Fila 7 -->
+                    <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="2"> H<sub>2</sub>O<sub>(l)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="2"> 2H<sub>2(g)</sub> + 
+                            <input type="text" class="input-coef" data-ans="1" placeholder="1"> O<sub>2(g)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none type-select" data-ans="descomposicion">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <!-- Fila 8 -->
+                    <tr>
+                        <td class="p-4 text-lg">
+                            <input type="text" class="input-coef" data-ans="2"> Al<sub>(s)</sub> + 
+                            <input type="text" class="input-coef" data-ans="6"> HCl<sub>(ac)</sub> &rarr; 
+                            <input type="text" class="input-coef" data-ans="2"> AlCl<sub>3(ac)</sub> + 
+                            <input type="text" class="input-coef" data-ans="3"> H<sub>2(g)</sub>
+                        </td>
+                        <td class="p-4">
+                            <select class="w-full p-2 border border-slate-300 rounded-lg outline-none type-select" data-ans="simple">
+                                <option value="">Selecciona...</option>
+                                <option value="sintesis">Síntesis</option>
+                                <option value="descomposicion">Descomposición</option>
+                                <option value="simple">Sustitución Simple</option>
+                                <option value="doble">Doble Sustitución</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-8 text-center">
+            <button onclick="verificarRespuestas()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                Verificar Respuestas
+            </button>
+            <p id="resultado" class="mt-4 font-bold text-lg hidden"></p>
+        </div>
+    </div>
+
+    <script>
+        function verificarRespuestas() {
+            let correctas = 0;
+            let totales = 0;
+
+            // Verificar coeficientes (Balanceo)
+            document.querySelectorAll('.input-coef').forEach(input => {
+                totales++;
+                input.classList.remove('correct', 'incorrect');
+                // Si está vacío, asumimos que el estudiante quiso decir "1"
+                let valor = input.value.trim() === "" ? "1" : input.value.trim();
+                
+                if (valor === input.getAttribute('data-ans')) {
+                    input.classList.add('correct');
+                    correctas++;
+                } else {
+                    input.classList.add('incorrect');
+                }
+            });
+
+            // Verificar tipos de reacción
+            document.querySelectorAll('.type-select').forEach(select => {
+                totales++;
+                select.classList.remove('correct', 'incorrect');
+                
+                if (select.value === select.getAttribute('data-ans')) {
+                    select.classList.add('correct');
+                    correctas++;
+                } else {
+                    select.classList.add('incorrect');
+                }
+            });
+
+            const resultadoTxt = document.getElementById('resultado');
+            resultadoTxt.classList.remove('hidden', 'text-green-600', 'text-red-600');
+            
+            if(correctas === totales) {
+                resultadoTxt.innerText = `¡Excelente! Todo está correcto (${correctas}/${totales}).`;
+                resultadoTxt.classList.add('text-green-600');
+            } else {
+                resultadoTxt.innerText = `Tienes ${correctas} aciertos de ${totales}. Revisa las casillas rojas e inténtalo de nuevo.`;
+                resultadoTxt.classList.add('text-red-600');
+            }
+        }
+    </script>
+</body>
+</html>

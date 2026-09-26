@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Módulo interactivo de química universitaria sobre estructura atómica, partículas subatómicas, números Z y A, átomos neutros e iones.">
+  <title>Módulo 1 | Estructura atómica e iones</title>
+  <style>
+    :root{
+      --navy:#12304a; --blue:#1769aa; --cyan:#14a6ba; --green:#21865a;
+      --red:#b43a3a; --amber:#a76500; --ink:#17212b; --muted:#586777;
+      --paper:#ffffff; --bg:#eef4f8; --line:#d4e0e8; --soft:#f6f9fb;
+      --focus:#ffbf47; --shadow:0 10px 28px rgba(18,48,74,.10);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:linear-gradient(180deg,#e8f4f7 0,#f5f8fb 28rem);line-height:1.6}
+    button,input{font:inherit}
+    button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+    .topbar{position:sticky;top:0;z-index:20;background:rgba(18,48,74,.97);color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.15)}
+    .topbar-inner{max-width:1120px;margin:auto;padding:.65rem 1rem;display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .brand{font-weight:800;letter-spacing:.2px}
+    .progress-wrap{display:flex;align-items:center;gap:.6rem;min-width:min(100%,330px)}
+    .progress{height:10px;flex:1;background:#ffffff30;border-radius:999px;overflow:hidden}
+    .progress > span{display:block;height:100%;width:0;background:#51d7a2;transition:width .35s}
+    main{max-width:1120px;margin:auto;padding:1.2rem}
+    .hero{display:grid;grid-template-columns:1.4fr .8fr;gap:1.2rem;align-items:center;padding:1.7rem;background:linear-gradient(135deg,var(--navy),#185a78);color:#fff;border-radius:22px;box-shadow:var(--shadow)}
+    .hero h1{font-size:clamp(2rem,4vw,3.4rem);line-height:1.08;margin:.1rem 0 .8rem}
+    .hero p{max-width:68ch;margin:.35rem 0;color:#e9f6fb}
+    .atom-art{min-height:230px;display:grid;place-items:center;position:relative}
+    .nucleus{width:78px;height:78px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff1a8,#f49b22 45%,#ce5b24);box-shadow:0 0 30px #ffc65d80;display:grid;place-items:center;font-weight:900;color:#512400;z-index:2}
+    .orbit{position:absolute;width:230px;height:92px;border:2px solid #c7f3ff99;border-radius:50%;transform:rotate(var(--r))}
+    .orbit::after{content:"e⁻";position:absolute;top:-14px;left:48%;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#77e4ff;color:#073452;font-weight:900;box-shadow:0 0 14px #77e4ff}
+    .navgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:.55rem;margin:1rem 0}
+    .navgrid a{text-decoration:none;color:var(--navy);background:#fff;border:1px solid var(--line);padding:.7rem;text-align:center;border-radius:12px;font-weight:700;font-size:.92rem}
+    .navgrid a:hover{background:#e9f7fa;border-color:var(--cyan)}
+    .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:clamp(1rem,2.5vw,1.5rem);margin:1rem 0;box-shadow:var(--shadow)}
+    h2{color:var(--navy);line-height:1.2;margin-top:0} h3{color:#174f72}
+    .eyebrow{display:inline-block;padding:.25rem .65rem;border-radius:999px;background:#dff5f7;color:#075967;font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .objectives,.concept-grid,.practice-grid{display:grid;gap:1rem}
+    .objectives{grid-template-columns:repeat(4,1fr)}
+    .concept-grid{grid-template-columns:repeat(3,1fr)}
+    .practice-grid{grid-template-columns:repeat(2,1fr)}
+    .mini{padding:1rem;background:var(--soft);border:1px solid var(--line);border-radius:14px}
+    .particle{border-top:5px solid var(--cyan)}
+    .particle.proton{border-color:#e05d4f}.particle.neutron{border-color:#81909b}.particle.electron{border-color:#238bd2}
+    .big-symbol{font-size:2rem;font-weight:900;color:var(--navy)}
+    .formula-row{display:flex;flex-wrap:wrap;gap:.75rem;margin:.8rem 0}
+    .formula{background:#102f48;color:#fff;border-radius:12px;padding:.7rem 1rem;font-size:1.05rem;font-weight:750}
+    .nuclide-demo{display:grid;grid-template-columns:auto 1fr;gap:1.2rem;align-items:center;background:#eef8fb;padding:1.1rem;border-radius:14px}
+    .nuclide{font-size:3.7rem;font-family:Georgia,serif;color:var(--navy);white-space:nowrap}
+    .tip,.warning{padding:1rem;border-left:5px solid var(--cyan);background:#eaf8fa;border-radius:10px;margin:.8rem 0}
+    .warning{border-color:#e6a02e;background:#fff7e7}
+    .question{border:1px solid var(--line);border-radius:15px;padding:1rem;margin:1rem 0;background:#fff}
+    .question legend{font-weight:800;padding:0 .35rem;color:var(--navy)}
+    .option{display:block;padding:.62rem .7rem;margin:.38rem 0;border:1px solid #dce6ec;border-radius:10px;cursor:pointer}
+    .option:hover{background:#f0f8fb}.option:has(input:checked){border-color:var(--blue);background:#eaf4fb}
+    .btns{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem}
+    button{border:0;border-radius:10px;padding:.68rem 1rem;font-weight:800;cursor:pointer;background:var(--blue);color:#fff}
+    button:hover{filter:brightness(.94)} button.secondary{background:#e7eef3;color:var(--navy)} button.hint{background:#8a5b00}
+    .feedback{margin-top:.75rem;padding:.75rem;border-radius:10px;display:none}
+    .feedback.correct{display:block;background:#e6f6ed;color:#155d3e;border:1px solid #9ad4b5}
+    .feedback.wrong{display:block;background:#fff0f0;color:#7e2323;border:1px solid #e1aaaa}
+    .feedback.info{display:block;background:#eef6ff;color:#164c76;border:1px solid #aacde8}
+    .input-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.55rem;align-items:end}
+    label span{display:block;font-weight:750;color:var(--navy);margin-bottom:.25rem}
+    input[type="number"]{width:100%;padding:.65rem;border:1px solid #b9c9d4;border-radius:9px;background:#fff}
+    table{width:100%;border-collapse:collapse;margin:.8rem 0}th,td{padding:.7rem;border-bottom:1px solid var(--line);text-align:left}th{background:#edf5f8;color:var(--navy)}
+    .scorebox{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;text-align:center}.metric{background:#eef7fa;border-radius:12px;padding:.8rem}.metric strong{display:block;font-size:1.6rem;color:var(--navy)}
+    details{border:1px solid var(--line);border-radius:12px;padding:.7rem 1rem;margin:.6rem 0;background:#fff}summary{cursor:pointer;font-weight:800;color:var(--navy)}
+    .checklist label{display:flex;gap:.55rem;align-items:flex-start;padding:.35rem}
+    footer{text-align:center;color:var(--muted);padding:2rem 1rem}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    @media (max-width:800px){.hero{grid-template-columns:1fr}.atom-art{min-height:190px}.navgrid{grid-template-columns:repeat(2,1fr)}.objectives,.concept-grid,.practice-grid{grid-template-columns:1fr 1fr}.input-row{grid-template-columns:1fr 1fr}.input-row button{grid-column:1/-1}.scorebox{grid-template-columns:1fr}}
+    @media (max-width:520px){main{padding:.7rem}.objectives,.concept-grid,.practice-grid{grid-template-columns:1fr}.nuclide-demo{grid-template-columns:1fr}.hero{padding:1.15rem}.orbit{width:190px;height:76px}}
+    @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Química básica · Ingeniería Agroindustrial</div>
+      <div class="progress-wrap" aria-label="Progreso del módulo"><span id="progressText">Progreso: 0%</span><div class="progress"><span id="progressBar"></span></div></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="titulo">
+      <div>
+        <span class="eyebrow">Módulo 1</span>
+        <h1 id="titulo">Estructura atómica e iones</h1>
+        <p>Aprende a interpretar un símbolo nuclear, calcular protones, neutrones y electrones, y distinguir átomos neutros, cationes y aniones.</p>
+        <p><strong>Meta de dominio:</strong> alcanzar al menos 80% en el reto final sin consultar la ficha.</p>
+      </div>
+      <div class="atom-art" aria-label="Representación esquemática de un átomo">
+        <div class="orbit" style="--r:0deg"></div><div class="orbit" style="--r:60deg"></div><div class="orbit" style="--r:120deg"></div>
+        <div class="nucleus">p⁺ n⁰</div>
+      </div>
+    </section>
+
+    <nav class="navgrid" aria-label="Secciones del módulo">
+      <a href="#objetivos">Objetivos</a><a href="#teoria">Teoría</a><a href="#simulador">Simulador</a><a href="#practica">Práctica</a><a href="#reto">Reto final</a><a href="#cierre">Cierre</a>
+    </nav>
+
+    <section id="objetivos" class="card">
+      <span class="eyebrow">Ruta de aprendizaje</span><h2>Lo que podrás hacer</h2>
+      <div class="objectives">
+        <div class="mini"><strong>1. Reconocer</strong><br>Las partículas subatómicas y su ubicación.</div>
+        <div class="mini"><strong>2. Interpretar</strong><br>Los números atómico, másico y la carga.</div>
+        <div class="mini"><strong>3. Calcular</strong><br>Protones, neutrones y electrones.</div>
+        <div class="mini"><strong>4. Clasificar</strong><br>Átomos neutros, cationes y aniones.</div>
+      </div>
+    </section>
+
+    <section id="teoria" class="card">
+      <span class="eyebrow">Ficha de estudio</span><h2>1. Partículas subatómicas</h2>
+      <div class="concept-grid">
+        <article class="mini particle proton"><div class="big-symbol">p⁺</div><h3>Protón</h3><p><strong>Carga:</strong> +1<br><strong>Masa aproximada:</strong> 1 u<br><strong>Ubicación:</strong> núcleo</p></article>
+        <article class="mini particle neutron"><div class="big-symbol">n⁰</div><h3>Neutrón</h3><p><strong>Carga:</strong> 0<br><strong>Masa aproximada:</strong> 1 u<br><strong>Ubicación:</strong> núcleo</p></article>
+        <article class="mini particle electron"><div class="big-symbol">e⁻</div><h3>Electrón</h3><p><strong>Carga:</strong> −1<br><strong>Masa aproximada:</strong> 0,00055 u<br><strong>Ubicación:</strong> región extranuclear</p></article>
+      </div>
+      <div class="tip"><strong>Idea clave:</strong> casi toda la masa del átomo se concentra en el núcleo. Los electrones determinan en gran medida su comportamiento químico.</div>
+
+      <h2>2. Números Z, A y carga</h2>
+      <div class="formula-row"><div class="formula">Z = protones</div><div class="formula">A = protones + neutrones</div><div class="formula">neutrones = A − Z</div><div class="formula">carga = protones − electrones</div></div>
+      <div class="nuclide-demo">
+        <div class="nuclide"><sup>23</sup><sub>11</sub>Na<sup>+</sup></div>
+        <div><p><strong>A = 23:</strong> protones + neutrones.</p><p><strong>Z = 11:</strong> tiene 11 protones.</p><p><strong>+1:</strong> perdió un electrón, por lo que tiene 10 electrones.</p><p><strong>Neutrones:</strong> 23 − 11 = 12.</p></div>
+      </div>
+      <div class="warning"><strong>No confundas:</strong> el número másico <em>A</em> corresponde a un núclido concreto y suele ser entero. La masa atómica de la tabla periódica es un promedio isotópico y será estudiada en el Módulo 2.</div>
+
+      <h2>3. Breve evolución de los modelos atómicos</h2>
+      <div class="practice-grid">
+        <div class="mini"><strong>Dalton</strong><br>Propuso átomos como unidades características de cada elemento.</div>
+        <div class="mini"><strong>Thomson</strong><br>Mostró la existencia del electrón y propuso un modelo con carga positiva difusa.</div>
+        <div class="mini"><strong>Rutherford</strong><br>Concluyó que el átomo posee un núcleo pequeño, denso y positivo.</div>
+        <div class="mini"><strong>Bohr y modelo cuántico</strong><br>Bohr introdujo niveles de energía; el modelo actual describe electrones mediante orbitales y probabilidades.</div>
+      </div>
+    </section>
+
+    <section id="simulador" class="card">
+      <span class="eyebrow">Laboratorio numérico</span><h2>Simulador de especies atómicas</h2>
+      <p>Introduce valores físicamente coherentes. El simulador calculará la composición y clasificará la especie.</p>
+      <div class="input-row">
+        <label><span>Número atómico Z</span><input id="simZ" type="number" min="1" step="1" value="11"></label>
+        <label><span>Número másico A</span><input id="simA" type="number" min="1" step="1" value="23"></label>
+        <label><span>Carga</span><input id="simCharge" type="number" step="1" value="1"></label>
+        <button type="button" onclick="runSimulator()">Calcular</button>
+      </div>
+      <div id="simResult" class="feedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <section id="practica" class="card">
+      <span class="eyebrow">Práctica guiada</span><h2>Comprueba cada idea</h2>
+      <div id="guidedQuestions"></div>
+    </section>
+
+    <section class="card">
+      <span class="eyebrow">Errores frecuentes</span><h2>Detecta y corrige</h2>
+      <details><summary>“Un ion negativo tiene menos electrones que protones”.</summary><p><strong>Corrección:</strong> un anión tiene más electrones que protones. Por ejemplo, Cl⁻ tiene 17 protones y 18 electrones.</p></details>
+      <details><summary>“A y Z representan lo mismo”.</summary><p><strong>Corrección:</strong> Z cuenta protones; A cuenta protones más neutrones.</p></details>
+      <details><summary>“Si una especie tiene carga +2, se suman dos electrones”.</summary><p><strong>Corrección:</strong> una carga positiva indica pérdida de electrones. Para un catión 2+, electrones = Z − 2.</p></details>
+    </section>
+
+    <section id="reto" class="card">
+      <span class="eyebrow">Evaluación</span><h2>Reto final tipo parcial</h2>
+      <p>Responde las 8 preguntas. Recibirás una explicación al finalizar, no durante el intento.</p>
+      <form id="finalQuiz"><div id="finalQuestions"></div>
+        <div class="btns"><button type="submit">Calificar intento</button><button type="button" class="secondary" onclick="resetQuiz()">Nuevo intento</button></div>
+      </form>
+      <div id="summary" class="feedback" role="status" aria-live="polite"></div>
+      <div id="review"></div>
+    </section>
+
+    <section id="cierre" class="card">
+      <span class="eyebrow">Cierre</span><h2>Checklist antes del Módulo 2</h2>
+      <div class="checklist">
+        <label><input type="checkbox" data-check="1"> Identifico carga, masa aproximada y ubicación de protones, neutrones y electrones.</label>
+        <label><input type="checkbox" data-check="2"> Calculo Z, A y el número de neutrones.</label>
+        <label><input type="checkbox" data-check="3"> Calculo electrones en especies neutras e iones.</label>
+        <label><input type="checkbox" data-check="4"> Distingo átomo neutro, catión y anión.</label>
+        <label><input type="checkbox" data-check="5"> Interpreto correctamente la notación nuclear.</label>
+      </div>
+      <div class="scorebox">
+        <div class="metric"><strong id="bestScore">0%</strong>Mejor resultado</div>
+        <div class="metric"><strong id="attempts">0</strong>Intentos</div>
+        <div class="metric"><strong id="checkCount">0/5</strong>Competencias marcadas</div>
+      </div>
+      <button type="button" class="secondary" onclick="clearProgress()">Borrar progreso guardado</button>
+    </section>
+  </main>
+  <footer>Material de estudio autónomo · Los resultados se guardan únicamente en este navegador.</footer>
+
+<script>
+const guided = [
+ {q:'¿Por qué un átomo neutro tiene igual número de protones y electrones?', options:['Porque ambas partículas tienen la misma masa','Porque sus cargas opuestas se compensan','Porque ambas están en el núcleo'], a:1, exp:'Cada protón aporta +1 y cada electrón −1. Para que la carga total sea cero, sus cantidades deben ser iguales.'},
+ {q:'Una especie tiene Z = 13 y A = 27. ¿Cuántos neutrones posee?', options:['13','14','27'], a:1, exp:'neutrones = A − Z = 27 − 13 = 14.'},
+ {q:'Una especie tiene 17 protones y 18 electrones. ¿Cómo se clasifica?', options:['Catión 1+','Átomo neutro','Anión 1−'], a:2, exp:'carga = 17 − 18 = −1. Al tener un electrón adicional, es un anión.'},
+ {q:'¿Qué afirmación sobre el número atómico Z es correcta?', options:['Es protones + neutrones','Identifica al elemento por su número de protones','Cambia cuando el átomo gana electrones'], a:1, exp:'Z es el número de protones. Ganar o perder electrones cambia la carga, pero no la identidad del elemento.'},
+ {q:'Para ⁴⁰₂₀Ca²⁺, ¿cuántos electrones hay?', options:['18','20','22'], a:0, exp:'El calcio tiene Z = 20. Una carga 2+ indica que perdió dos electrones: 20 − 2 = 18.'}
+];
+const finals = [
+ {q:'El núcleo de un átomo contiene:', o:['protones y electrones','protones y neutrones','neutrones y electrones','solo protones'], a:1, e:'El núcleo contiene protones y neutrones; los electrones ocupan la región extranuclear.'},
+ {q:'Si Z = 8 y A = 18, el número de neutrones es:', o:['8','10','18','26'], a:1, e:'N = A − Z = 18 − 8 = 10.'},
+ {q:'Una especie con 12 protones y 10 electrones posee carga:', o:['2−','1−','neutra','2+'], a:3, e:'carga = 12 − 10 = +2.'},
+ {q:'¿Cuál conjunto describe correctamente a ³⁵₁₇Cl⁻?', o:['17 p, 18 n, 18 e','17 p, 35 n, 16 e','18 p, 17 n, 18 e','17 p, 18 n, 16 e'], a:0, e:'p = 17; n = 35 − 17 = 18; al ser 1−, e = 18.'},
+ {q:'Cuando un átomo forma un catión:', o:['gana protones','pierde electrones','gana neutrones','pierde protones'], a:1, e:'Los procesos químicos ordinarios cambian electrones. Un catión se forma al perder uno o más electrones.'},
+ {q:'¿Qué cambio modifica la identidad del elemento?', o:['ganar un electrón','perder dos electrones','cambiar el número de protones','cambiar el número de neutrones'], a:2, e:'La identidad química está definida por Z, es decir, por el número de protones.'},
+ {q:'Un átomo neutro de aluminio, Z = 13, tiene:', o:['13 e','12 e','14 e','27 e'], a:0, e:'En un átomo neutro, e = p = Z = 13.'},
+ {q:'En control de calidad se identifica Ca²⁺ con A = 40 y Z = 20. Su composición es:', o:['20 p, 20 n, 22 e','20 p, 20 n, 18 e','18 p, 22 n, 20 e','20 p, 18 n, 20 e'], a:1, e:'p = 20; n = 40 − 20 = 20; e = 20 − 2 = 18.'}
+];
+
+function renderGuided(){
+ const root=document.getElementById('guidedQuestions');
+ root.innerHTML=guided.map((x,i)=>`<fieldset class="question"><legend>${i+1}. ${x.q}</legend>${x.options.map((o,j)=>`<label class="option"><input type="radio" name="g${i}" value="${j}"> ${o}</label>`).join('')}<div class="btns"><button type="button" onclick="checkGuided(${i})">Verificar</button><button type="button" class="hint" onclick="showHint(${i})">Pista</button></div><div id="gf${i}" class="feedback" aria-live="polite"></div></fieldset>`).join('');
+}
+function checkGuided(i){
+ const pick=document.querySelector(`input[name="g${i}"]:checked`), out=document.getElementById(`gf${i}`);
+ if(!pick){out.className='feedback info';out.textContent='Selecciona una opción antes de verificar.';return;}
+ const ok=Number(pick.value)===guided[i].a;
+ out.className='feedback '+(ok?'correct':'wrong');
+ out.innerHTML=(ok?'✅ <strong>Correcto.</strong> ':'❌ <strong>Revisa.</strong> ')+guided[i].exp;
+ if(ok){localStorage.setItem('m1_guided_'+i,'1');updateProgress();}
+}
+function showHint(i){
+ const hints=['Piensa en la suma algebraica de +1 y −1.','Usa N = A − Z.','Compara protones con electrones.','La identidad de un elemento depende del núcleo.','Una carga positiva indica electrones perdidos.'];
+ const out=document.getElementById(`gf${i}`);out.className='feedback info';out.textContent='💡 '+hints[i];
+}
+function runSimulator(){
+ const Z=Number(document.getElementById('simZ').value), A=Number(document.getElementById('simA').value), c=Number(document.getElementById('simCharge').value), out=document.getElementById('simResult');
+ if(!Number.isInteger(Z)||!Number.isInteger(A)||!Number.isInteger(c)||Z<1||A<Z){out.className='feedback wrong';out.textContent='Usa números enteros y asegúrate de que A sea mayor o igual que Z.';return;}
+ const p=Z,n=A-Z,e=Z-c;
+ if(e<0){out.className='feedback wrong';out.textContent='La carga ingresada produciría un número negativo de electrones. Revisa los datos.';return;}
+ const type=c===0?'átomo neutro':c>0?`catión ${c}+`:`anión ${Math.abs(c)}−`;
+ out.className='feedback correct';out.innerHTML=`<strong>Resultado:</strong> ${p} protones, ${n} neutrones y ${e} electrones. La especie es un <strong>${type}</strong>.<br>Comprobación: carga = ${p} − ${e} = ${c}.`;
+ localStorage.setItem('m1_sim','1');updateProgress();
+}
+function renderFinal(){
+ document.getElementById('finalQuestions').innerHTML=finals.map((x,i)=>`<fieldset class="question"><legend>${i+1}. ${x.q}</legend>${x.o.map((o,j)=>`<label class="option"><input type="radio" name="f${i}" value="${j}"> ${o}</label>`).join('')}</fieldset>`).join('');
+}
+document.getElementById('finalQuiz').addEventListener('submit',e=>{
+ e.preventDefault(); let score=0, missing=0, review='';
+ finals.forEach((x,i)=>{const p=document.querySelector(`input[name="f${i}"]:checked`);if(!p){missing++;return;}const ok=Number(p.value)===x.a;if(ok)score++;review+=`<details><summary>${i+1}. ${ok?'✅ Correcta':'❌ Por revisar'}</summary><p>${x.e}</p></details>`;});
+ const pct=Math.round(score/finals.length*100), out=document.getElementById('summary');
+ out.className='feedback '+(pct>=80?'correct':'wrong');out.innerHTML=`<strong>${score}/${finals.length} · ${pct}%</strong><br>${missing?`Dejaste ${missing} pregunta(s) sin responder. `:''}${pct>=80?'Dominio alcanzado. Puedes avanzar, aunque conviene revisar los errores.':'Aún no se alcanza la meta de 80%. Revisa la explicación y realiza un nuevo intento.'}`;
+ document.getElementById('review').innerHTML='<h3>Retroalimentación</h3>'+review;
+ const attempts=Number(localStorage.getItem('m1_attempts')||0)+1, best=Math.max(pct,Number(localStorage.getItem('m1_best')||0));
+ localStorage.setItem('m1_attempts',attempts);localStorage.setItem('m1_best',best);localStorage.setItem('m1_final',pct>=80?'1':'0');updateProgress();out.scrollIntoView({behavior:'smooth',block:'center'});
+});
+function resetQuiz(){document.getElementById('finalQuiz').reset();document.getElementById('summary').className='feedback';document.getElementById('summary').textContent='';document.getElementById('review').innerHTML='';}
+function updateChecklist(){let n=0;document.querySelectorAll('[data-check]').forEach(cb=>{if(cb.checked)n++;localStorage.setItem('m1_check_'+cb.dataset.check,cb.checked?'1':'0')});document.getElementById('checkCount').textContent=n+'/5';updateProgress();}
+function updateProgress(){
+ const guidedDone=guided.filter((_,i)=>localStorage.getItem('m1_guided_'+i)==='1').length;
+ const checks=[1,2,3,4,5].filter(i=>localStorage.getItem('m1_check_'+i)==='1').length;
+ const done=guidedDone+(localStorage.getItem('m1_sim')==='1'?1:0)+(localStorage.getItem('m1_final')==='1'?1:0)+checks;
+ const total=guided.length+1+1+5,pct=Math.round(done/total*100);
+ document.getElementById('progressBar').style.width=pct+'%';document.getElementById('progressText').textContent='Progreso: '+pct+'%';document.getElementById('bestScore').textContent=(localStorage.getItem('m1_best')||0)+'%';document.getElementById('attempts').textContent=localStorage.getItem('m1_attempts')||0;document.getElementById('checkCount').textContent=checks+'/5';
+}
+function clearProgress(){if(confirm('¿Deseas borrar puntajes, intentos y checklist de este módulo?')){Object.keys(localStorage).filter(k=>k.startsWith('m1_')).forEach(k=>localStorage.removeItem(k));document.querySelectorAll('[data-check]').forEach(x=>x.checked=false);resetQuiz();updateProgress();}}
+function init(){renderGuided();renderFinal();document.querySelectorAll('[data-check]').forEach(cb=>{cb.checked=localStorage.getItem('m1_check_'+cb.dataset.check)==='1';cb.addEventListener('change',updateChecklist)});updateProgress();}
+init();
+</script>
+</body>
+</html>

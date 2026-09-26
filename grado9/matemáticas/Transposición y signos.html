@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crafting Algebraico: Transposición y Signos</title>
+    <style>
+        /* =========================================
+           VARIABLES Y ESTILOS GLOBALES (MINECRAFT)
+           ========================================= */
+        :root {
+            --mc-dirt: #7a5a3d;
+            --mc-grass: #5c913b;
+            --mc-stone: #7d7d7d;
+            --mc-dark-stone: #3a3a3a;
+            --mc-wood: #8e6840;
+            --mc-planks: #a67d53;
+            --mc-text: #ffffff;
+            --mc-text-shadow: 2px 2px 0px #3f3f3f;
+            --mc-diamond: #55ffff;
+            --mc-redstone: #ff5555;
+            --mc-xp: #55ff55;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--mc-stone);
+            color: var(--mc-text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Utilidad para sombras tipo píxel */
+        .pixel-border {
+            border: 4px solid #000;
+            box-shadow: inset 4px 4px 0px rgba(255, 255, 255, 0.4), inset -4px -4px 0px rgba(0, 0, 0, 0.4);
+        }
+        
+        .pixel-border-inverted {
+            border: 4px solid #000;
+            box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.4), inset -4px -4px 0px rgba(255, 255, 255, 0.4);
+        }
+
+        /* =========================================
+           ENCABEZADO
+           ========================================= */
+        header {
+            background-color: var(--mc-dirt);
+            border-bottom: 12px solid var(--mc-grass);
+            padding: 15px;
+            text-align: center;
+            text-shadow: var(--mc-text-shadow);
+        }
+
+        header h2 { font-size: 1.2rem; color: #ddd; margin-bottom: 5px; }
+        header h1 { font-size: 1.8rem; color: var(--mc-diamond); text-transform: uppercase; }
+
+        /* =========================================
+           NAVEGACIÓN PRINCIPAL
+           ========================================= */
+        .main-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            background-color: var(--mc-dark-stone);
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background-color: var(--mc-stone);
+            color: white;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: var(--mc-text-shadow);
+            transition: transform 0.1s;
+        }
+
+        .tab-btn:active { transform: scale(0.95); }
+        .tab-btn.active {
+            background-color: var(--mc-grass);
+        }
+
+        /* =========================================
+           CONTENEDORES DE MÓDULOS
+           ========================================= */
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .module {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            background-color: #c6c6c6;
+            color: #000;
+            padding: 20px;
+        }
+
+        .module.active { display: block; }
+        
+        .module-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            background-color: var(--mc-dark-stone);
+            color: white;
+            padding: 10px;
+            text-shadow: var(--mc-text-shadow);
+        }
+
+        /* Sub-Navegación Interna (Ejemplos) */
+        .sub-nav {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .sub-tab-btn {
+            background-color: var(--mc-planks);
+            padding: 5px 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .sub-tab-btn.active {
+            background-color: var(--mc-wood);
+            color: white;
+        }
+
+        /* =========================================
+           UI ELEMENTOS COMUNES
+           ========================================= */
+        .btn {
+            background-color: var(--mc-stone);
+            padding: 10px 20px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: var(--mc-text-shadow);
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .btn:active { box-shadow: inset 4px 4px 0px rgba(0, 0, 0, 0.4), inset -4px -4px 0px rgba(255, 255, 255, 0.4); }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+        .feedback-box.success {
+            display: block;
+            background-color: var(--mc-grass);
+            color: white;
+            text-shadow: var(--mc-text-shadow);
+        }
+        .feedback-box.error {
+            display: block;
+            background-color: var(--mc-redstone);
+            color: white;
+            text-shadow: var(--mc-text-shadow);
+        }
+
+        /* =========================================
+           MÓDULO 1: TRADUCTOR (CRAFTEO)
+           ========================================= */
+        .crafting-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .craft-col {
+            background-color: var(--mc-dark-stone);
+            padding: 15px;
+            color: white;
+        }
+        .craft-item {
+            background-color: var(--mc-stone);
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .craft-item.selected { background-color: var(--mc-diamond); color: #000; text-shadow: none; }
+        .craft-item.matched { background-color: var(--mc-grass); cursor: not-allowed; opacity: 0.8; }
+        
+        @media (max-width: 600px) {
+            .crafting-container { grid-template-columns: 1fr; }
+        }
+
+        /* =========================================
+           MÓDULO 2 & 3: LABORATORIO / INSPECTOR
+           ========================================= */
+        .equation-display {
+            font-size: 2rem;
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .option-btn {
+            background-color: var(--mc-planks);
+            padding: 15px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .option-btn:hover { background-color: var(--mc-wood); color: white; }
+
+        .step-container {
+            background-color: var(--mc-dark-stone);
+            color: var(--mc-diamond);
+            padding: 15px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        /* =========================================
+           MÓDULO 4: DESAFÍO Y REPORTE
+           ========================================= */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--mc-dark-stone);
+            padding: 10px;
+            color: white;
+            margin-bottom: 15px;
+        }
+        .xp-container {
+            flex-grow: 1;
+            margin: 0 15px;
+            height: 20px;
+            background-color: #000;
+            border: 2px solid white;
+        }
+        .xp-fill {
+            height: 100%;
+            background-color: var(--mc-xp);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .report-card {
+            background-color: #fff;
+            padding: 20px;
+            color: #000;
+            margin-top: 20px;
+        }
+        .report-card h3 { color: var(--mc-wood); margin-bottom: 10px; }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .report-table th, .report-table td {
+            border: 2px solid var(--mc-dark-stone);
+            padding: 8px;
+            text-align: left;
+        }
+        .report-table th { background-color: var(--mc-stone); color: white; }
+
+    </style>
+</head>
+<body>
+
+    <header class="pixel-border">
+        <h2>IE Miguel Antonio Caro | Grado 9° - Matemáticas</h2>
+        <h1>Crafting Algebraico: Transposición y Signos</h1>
+    </header>
+
+    <nav class="main-nav pixel-border">
+        <div class="tab-btn pixel-border active" onclick="switchMainTab('m1')">1. Traductor</div>
+        <div class="tab-btn pixel-border" onclick="switchMainTab('m2')">2. Laboratorio</div>
+        <div class="tab-btn pixel-border" onclick="switchMainTab('m3')">3. Inspector</div>
+        <div class="tab-btn pixel-border" onclick="switchMainTab('m4')">4. Desafío Final</div>
+    </nav>
+
+    <main>
+        <!-- =========================================
+             MÓDULO 1: TRADUCTOR ALGEBRAICO
+             ========================================= -->
+        <section id="m1" class="module pixel-border active">
+            <h2 class="module-title pixel-border">El Traductor Algebraico</h2>
+            <p style="margin-bottom: 15px;">Selecciona una frase en lenguaje cotidiano y emparéjala con su expresión matemática correcta haciendo clic en ambas. ¡Cuidado con los signos!</p>
+            
+            <nav class="sub-nav" id="m1-nav">
+                <!-- Se inyecta por JS -->
+            </nav>
+
+            <div id="m1-content">
+                <div class="crafting-container">
+                    <div class="craft-col pixel-border" id="m1-phrases"></div>
+                    <div class="craft-col pixel-border" id="m1-expressions"></div>
+                </div>
+                <div id="m1-feedback" class="feedback-box pixel-border"></div>
+            </div>
+        </section>
+
+        <!-- =========================================
+             MÓDULO 2: LABORATORIO DE TRANSPOSICIÓN
+             ========================================= -->
+        <section id="m2" class="module pixel-border">
+            <h2 class="module-title pixel-border">Laboratorio de Transposición</h2>
+            <p style="margin-bottom: 15px;">Aprende el paso a paso. Recuerda: ¡Al pasar a multiplicar o dividir, el número CONSERVA su signo original!</p>
+            
+            <nav class="sub-nav" id="m2-nav"></nav>
+
+            <div id="m2-content">
+                <div class="equation-display pixel-border" id="m2-eq"></div>
+                <div id="m2-question-area">
+                    <p style="font-weight: bold; margin-bottom: 10px;" id="m2-question-text"></p>
+                    <div class="options-grid" id="m2-options"></div>
+                </div>
+                <div id="m2-feedback" class="feedback-box pixel-border"></div>
+                <div id="m2-next-step-btn" class="btn pixel-border" style="display: none; margin-top:15px;" onclick="m2NextStep()">Siguiente Paso</div>
+            </div>
+        </section>
+
+        <!-- =========================================
+             MÓDULO 3: INSPECTOR DE SOLUCIONES
+             ========================================= -->
+        <section id="m3" class="module pixel-border">
+            <h2 class="module-title pixel-border">El Inspector de Soluciones</h2>
+            <p style="margin-bottom: 15px;">Reemplaza la 'x' por el valor propuesto y verifica si la igualdad se cumple.</p>
+            
+            <nav class="sub-nav" id="m3-nav"></nav>
+
+            <div id="m3-content">
+                <div class="equation-display pixel-border" id="m3-eq"></div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="font-size: 1.2rem;">Valor propuesto: <strong id="m3-val"></strong></p>
+                    <div class="btn pixel-border" onclick="m3Simulate()">Sustituir y Calcular</div>
+                </div>
+                
+                <div id="m3-steps-container"></div>
+                
+                <div id="m3-decision" style="display: none; text-align: center; margin-top: 15px;">
+                    <p style="font-weight: bold; margin-bottom: 10px;">¿El valor propuesto es la solución correcta?</p>
+                    <div class="btn pixel-border" style="background-color: var(--mc-grass);" onclick="m3CheckAnswer(true)">¡Es Verdadera!</div>
+                    <div class="btn pixel-border" style="background-color: var(--mc-redstone);" onclick="m3CheckAnswer(false)">¡Es Falsa!</div>
+                </div>
+                <div id="m3-feedback" class="feedback-box pixel-border"></div>
+            </div>
+        </section>
+
+        <!-- =========================================
+             MÓDULO 4: DESAFÍO FINAL DE CRAFTEO
+             ========================================= -->
+        <section id="m4" class="module pixel-border">
+            <h2 class="module-title pixel-border">Desafío Final de Crafteo</h2>
+            
+            <div id="m4-start-screen">
+                <p>Identifícate antes de ingresar al calabozo matemático.</p>
+                <input type="text" id="student-name" placeholder="Tu Nombre y Apellido" class="pixel-border-inverted" style="width: 100%; padding: 10px; margin: 15px 0; font-size: 1.1rem;">
+                <div class="btn pixel-border" onclick="startExam()">Iniciar Evaluación</div>
+            </div>
+
+            <div id="m4-exam-screen" style="display: none;">
+                <div class="hud pixel-border">
+                    <span>💎 <span id="hud-score">0</span></span>
+                    <div class="xp-container"><div class="xp-fill" id="hud-xp"></div></div>
+                    <span>Pregunta <span id="hud-qnum">1</span>/8</span>
+                </div>
+                <div class="equation-display pixel-border" id="m4-question-text" style="font-size: 1.2rem;"></div>
+                <div class="options-grid" id="m4-options"></div>
+                <div id="m4-feedback" class="feedback-box pixel-border"></div>
+                <div id="m4-next-btn" class="btn pixel-border" style="display: none; width: 100%; margin-top: 15px;" onclick="m4NextQuestion()">Siguiente Pregunta</div>
+            </div>
+
+            <div id="m4-result-screen" style="display: none;">
+                <div class="report-card pixel-border">
+                    <h2 style="text-align: center; color: #000;">LOGRO DESBLOQUEADO</h2>
+                    <h3 style="text-align: center;" id="rep-name"></h3>
+                    <div style="font-size: 1.5rem; text-align: center; margin: 20px 0;">
+                        Nota Final: <strong id="rep-grade" style="font-size: 2rem;"></strong> / 5.0
+                    </div>
+                    <p style="text-align: center;" id="rep-msg"></p>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Pregunta</th>
+                                <th>Tu Respuesta</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rep-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // =========================================
+        // NAVEGACIÓN PRINCIPAL
+        // =========================================
+        function switchMainTab(moduleId) {
+            document.querySelectorAll('.module').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(moduleId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // =========================================
+        // DATOS Y LÓGICA: MÓDULO 1 (TRADUCTOR)
+        // =========================================
+        const m1Data = [
+            { id: 1, pairs: [ {p:"Un número aumentado en 8", e:"x + 8"}, {p:"El doble de un número", e:"2x"}, {p:"El triple de un número menos cinco", e:"3x - 5"} ] },
+            { id: 2, pairs: [ {p:"La mitad de un número", e:"x / 2"}, {p:"Un número disminuido en su doble", e:"x - 2x"}, {p:"El cuádruple de la suma de un número y uno", e:"4(x + 1)"} ] },
+            { id: 3, pairs: [ {p:"El cuadrado de un número", e:"x²"}, {p:"La suma de tres números consecutivos", e:"x + (x+1) + (x+2)"}, {p:"Cinco veces un número más su mitad", e:"5x + x/2"} ] },
+            { id: 4, pairs: [ {p:"El exceso de un número sobre diez", e:"x - 10"}, {p:"Diez menos un número", e:"10 - x"}, {p:"El producto de un número y su consecutivo", e:"x(x + 1)"} ] },
+            { id: 5, pairs: [ {p:"La tercera parte de un número disminuido en cuatro", e:"x/3 - 4"}, {p:"La tercera parte de la resta entre un número y cuatro", e:"(x - 4)/3"}, {p:"El opuesto de un número", e:"-x"} ] }
+        ];
+
+        let m1CurrentEx = 0;
+        let m1SelectedPhrase = null;
+        let m1SelectedExpr = null;
+        let m1MatchesFound = 0;
+
+        function renderM1Nav() {
+            const nav = document.getElementById('m1-nav');
+            nav.innerHTML = '';
+            m1Data.forEach((_, i) => {
+                const btn = document.createElement('div');
+                btn.className = `sub-tab-btn pixel-border ${i === 0 ? 'active' : ''}`;
+                btn.textContent = `Ejemplo ${i+1}`;
+                btn.onclick = () => loadM1(i, btn);
+                nav.appendChild(btn);
+            });
+            loadM1(0, nav.firstChild);
+        }
+
+        function loadM1(index, btnEl) {
+            document.querySelectorAll('#m1-nav .sub-tab-btn').forEach(el => el.classList.remove('active'));
+            if(btnEl) btnEl.classList.add('active');
+            
+            m1CurrentEx = index;
+            m1SelectedPhrase = null;
+            m1SelectedExpr = null;
+            m1MatchesFound = 0;
+            
+            const fb = document.getElementById('m1-feedback');
+            fb.className = 'feedback-box pixel-border';
+            fb.style.display = 'none';
+
+            const phrasesContainer = document.getElementById('m1-phrases');
+            const exprContainer = document.getElementById('m1-expressions');
+            phrasesContainer.innerHTML = '<h3>Lenguaje Cotidiano</h3><br>';
+            exprContainer.innerHTML = '<h3>Expresión Algebraica</h3><br>';
+
+            // Shuffle data
+            const pairs = m1Data[index].pairs;
+            let phrases = [...pairs];
+            let expressions = [...pairs].sort(() => Math.random() - 0.5);
+
+            phrases.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = 'craft-item pixel-border';
+                div.textContent = item.p;
+                div.dataset.match = item.e;
+                div.onclick = () => selectM1Item(div, 'phrase');
+                phrasesContainer.appendChild(div);
+            });
+
+            expressions.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = 'craft-item pixel-border';
+                div.textContent = item.e;
+                div.dataset.value = item.e;
+                div.onclick = () => selectM1Item(div, 'expr');
+                exprContainer.appendChild(div);
+            });
+        }
+
+        function selectM1Item(element, type) {
+            if (element.classList.contains('matched')) return;
+
+            if (type === 'phrase') {
+                if(m1SelectedPhrase) m1SelectedPhrase.classList.remove('selected');
+                m1SelectedPhrase = element;
+                m1SelectedPhrase.classList.add('selected');
+            } else {
+                if(m1SelectedExpr) m1SelectedExpr.classList.remove('selected');
+                m1SelectedExpr = element;
+                m1SelectedExpr.classList.add('selected');
+            }
+
+            if (m1SelectedPhrase && m1SelectedExpr) {
+                checkM1Match();
+            }
+        }
+
+        function checkM1Match() {
+            const pMatch = m1SelectedPhrase.dataset.match;
+            const eVal = m1SelectedExpr.dataset.value;
+            const fb = document.getElementById('m1-feedback');
+
+            if (pMatch === eVal) {
+                m1SelectedPhrase.classList.remove('selected');
+                m1SelectedPhrase.classList.add('matched');
+                m1SelectedExpr.classList.remove('selected');
+                m1SelectedExpr.classList.add('matched');
+                fb.textContent = "¡Crafteo exitoso!";
+                fb.className = 'feedback-box pixel-border success';
+                m1MatchesFound++;
+                if(m1MatchesFound === m1Data[m1CurrentEx].pairs.length) {
+                    fb.textContent = "¡Nivel completado! Pasa al siguiente ejemplo.";
+                }
+            } else {
+                m1SelectedPhrase.classList.remove('selected');
+                m1SelectedExpr.classList.remove('selected');
+                fb.textContent = "Error: Esas partes no encajan.";
+                fb.className = 'feedback-box pixel-border error';
+            }
+            m1SelectedPhrase = null;
+            m1SelectedExpr = null;
+        }
+
+        // =========================================
+        // DATOS Y LÓGICA: MÓDULO 2 (LABORATORIO)
+        // =========================================
+        const m2Data = [
+            { 
+                startEq: "x - 7 = 15",
+                steps: [
+                    { q: "¿Cómo pasa el -7 al lado derecho?",
+                      options: [
+                          { t: "Pasa a restar como -7", correct: false, f: "¡Cuidado! El opuesto de restar es sumar." },
+                          { t: "Pasa a sumar como +7", correct: true, f: "¡Correcto! Cambia de signo al pasar a sumar." }
+                      ],
+                      newEq: "x = 15 + 7<br>x = 22"
+                    }
+                ]
+            },
+            { 
+                startEq: "-3x = 12",
+                steps: [
+                    { q: "¿Cómo pasa el -3 al lado derecho? (¡Ojo con el signo!)",
+                      options: [
+                          { t: "Pasa a dividir como +3", correct: false, f: "ERROR CRÍTICO: Al multiplicar o dividir, el número CONSERVA su signo. ¡No cambia!" },
+                          { t: "Pasa a dividir como -3", correct: true, f: "¡Excelente! Como está multiplicando, pasa a dividir y SE LLEVA su signo." }
+                      ],
+                      newEq: "x = 12 / -3<br>x = -4"
+                    }
+                ]
+            },
+            { 
+                startEq: "2x + 5 = 17",
+                steps: [
+                    { q: "Paso 1: ¿Qué término movemos primero y cómo?",
+                      options: [
+                          { t: "Movemos el 2 a dividir.", correct: false, f: "Primero debemos mover los términos que suman o restan." },
+                          { t: "Movemos el +5 a restar (-5).", correct: true, f: "¡Bien! Primero sumas y restas." }
+                      ],
+                      newEq: "2x = 17 - 5<br>2x = 12"
+                    },
+                    { q: "Paso 2: ¿Cómo pasa el 2?",
+                      options: [
+                          { t: "Pasa a dividir como 2", correct: true, f: "Correcto, pasa a dividir conservando su signo positivo." },
+                          { t: "Pasa a dividir como -2", correct: false, f: "No, al dividir conserva su signo original (+2)." }
+                      ],
+                      newEq: "x = 12 / 2<br>x = 6"
+                    }
+                ]
+            },
+            { 
+                startEq: "-4x = 20",
+                steps: [
+                    { q: "¿Cómo despejamos la x?",
+                      options: [
+                          { t: "Pasamos -4 a sumar (+4)", correct: false, f: "El -4 no está restando, está MULTIPLICANDO a la x." },
+                          { t: "Pasamos -4 a dividir, queda x = 20 / -4", correct: true, f: "¡Perfecto! Pasa a dividir conservando el signo negativo." }
+                      ],
+                      newEq: "x = -5"
+                    }
+                ]
+            },
+            { 
+                startEq: "5x = 2x + 9",
+                steps: [
+                    { q: "Queremos agrupar las 'x' a la izquierda. ¿Cómo pasa el 2x?",
+                      options: [
+                          { t: "Pasa a sumar (+2x)", correct: false, f: "El 2x es positivo a la derecha, debe pasar con signo contrario." },
+                          { t: "Pasa a restar (-2x)", correct: true, f: "¡Correcto! Cambia de signo al trasponerse." }
+                      ],
+                      newEq: "5x - 2x = 9<br>3x = 9"
+                    },
+                    { q: "¿Cómo terminamos?",
+                      options: [
+                          { t: "El 3 pasa a dividir, x = 3", correct: true, f: "¡Excelente! Fin del ejercicio." },
+                          { t: "El 3 pasa a restar, x = 6", correct: false, f: "El 3 está multiplicando, debe pasar a dividir." }
+                      ],
+                      newEq: "x = 9 / 3<br>x = 3"
+                    }
+                ]
+            }
+        ];
+
+        let m2CurrentEx = 0;
+        let m2CurrentStep = 0;
+
+        function renderM2Nav() {
+            const nav = document.getElementById('m2-nav');
+            nav.innerHTML = '';
+            m2Data.forEach((_, i) => {
+                const btn = document.createElement('div');
+                btn.className = `sub-tab-btn pixel-border ${i === 0 ? 'active' : ''}`;
+                btn.textContent = `Ejemplo ${i+1}`;
+                btn.onclick = () => loadM2(i, btn);
+                nav.appendChild(btn);
+            });
+            loadM2(0, nav.firstChild);
+        }
+
+        function loadM2(index, btnEl) {
+            document.querySelectorAll('#m2-nav .sub-tab-btn').forEach(el => el.classList.remove('active'));
+            if(btnEl) btnEl.classList.add('active');
+            
+            m2CurrentEx = index;
+            m2CurrentStep = 0;
+            
+            document.getElementById('m2-eq').innerHTML = m2Data[index].startEq;
+            document.getElementById('m2-feedback').style.display = 'none';
+            document.getElementById('m2-next-step-btn').style.display = 'none';
+            
+            renderM2Step();
+        }
+
+        function renderM2Step() {
+            const stepData = m2Data[m2CurrentEx].steps[m2CurrentStep];
+            if (!stepData) return; // Terminado
+
+            document.getElementById('m2-question-text').innerHTML = stepData.q;
+            const optionsContainer = document.getElementById('m2-options');
+            optionsContainer.innerHTML = '';
+            
+            stepData.options.forEach((opt, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn pixel-border';
+                btn.textContent = opt.t;
+                btn.onclick = () => m2CheckAnswer(opt, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function m2CheckAnswer(opt, btnEl) {
+            // Deshabilitar botones
+            document.querySelectorAll('#m2-options .option-btn').forEach(b => b.style.pointerEvents = 'none');
+            
+            const fb = document.getElementById('m2-feedback');
+            fb.innerHTML = opt.f;
+            
+            if (opt.correct) {
+                btnEl.style.backgroundColor = 'var(--mc-grass)';
+                fb.className = 'feedback-box pixel-border success';
+                
+                // Actualizar ecuación
+                setTimeout(() => {
+                    document.getElementById('m2-eq').innerHTML = m2Data[m2CurrentEx].steps[m2CurrentStep].newEq;
+                    m2CurrentStep++;
+                    if (m2CurrentStep < m2Data[m2CurrentEx].steps.length) {
+                        document.getElementById('m2-next-step-btn').style.display = 'inline-block';
+                    } else {
+                        fb.innerHTML += "<br>¡Ejercicio Completado!";
+                    }
+                }, 1000);
+
+            } else {
+                btnEl.style.backgroundColor = 'var(--mc-redstone)';
+                fb.className = 'feedback-box pixel-border error';
+                
+                // Permitir reintento
+                setTimeout(() => {
+                    document.querySelectorAll('#m2-options .option-btn').forEach(b => {
+                        b.style.pointerEvents = 'auto';
+                        b.style.backgroundColor = 'var(--mc-planks)';
+                    });
+                    fb.style.display = 'none';
+                }, 2500);
+            }
+        }
+
+        function m2NextStep() {
+            document.getElementById('m2-next-step-btn').style.display = 'none';
+            document.getElementById('m2-feedback').style.display = 'none';
+            renderM2Step();
+        }
+
+
+        // =========================================
+        // DATOS Y LÓGICA: MÓDULO 3 (INSPECTOR)
+        // =========================================
+        const m3Data = [
+            { eq: "2x + 1 = 9", val: 4, steps: ["2(4) + 1 = 9", "8 + 1 = 9", "9 = 9"], isTrue: true },
+            { eq: "-3x = 15", val: 5, steps: ["-3(5) = 15", "-15 = 15"], isTrue: false },
+            { eq: "x - 8 = -2", val: 6, steps: ["(6) - 8 = -2", "-2 = -2"], isTrue: true },
+            { eq: "4x + 2 = 3x + 5", val: 3, steps: ["4(3) + 2 = 3(3) + 5", "12 + 2 = 9 + 5", "14 = 14"], isTrue: true },
+            { eq: "-2x + 4 = 10", val: -3, steps: ["-2(-3) + 4 = 10", "6 + 4 = 10", "10 = 10"], isTrue: true }
+        ];
+
+        let m3CurrentEx = 0;
+
+        function renderM3Nav() {
+            const nav = document.getElementById('m3-nav');
+            nav.innerHTML = '';
+            m3Data.forEach((_, i) => {
+                const btn = document.createElement('div');
+                btn.className = `sub-tab-btn pixel-border ${i === 0 ? 'active' : ''}`;
+                btn.textContent = `Reto ${i+1}`;
+                btn.onclick = () => loadM3(i, btn);
+                nav.appendChild(btn);
+            });
+            loadM3(0, nav.firstChild);
+        }
+
+        function loadM3(index, btnEl) {
+            document.querySelectorAll('#m3-nav .sub-tab-btn').forEach(el => el.classList.remove('active'));
+            if(btnEl) btnEl.classList.add('active');
+            
+            m3CurrentEx = index;
+            document.getElementById('m3-eq').textContent = m3Data[index].eq;
+            document.getElementById('m3-val').textContent = "x = " + m3Data[index].val;
+            
+            document.getElementById('m3-steps-container').innerHTML = '';
+            document.getElementById('m3-decision').style.display = 'none';
+            document.getElementById('m3-feedback').style.display = 'none';
+        }
+
+        function m3Simulate() {
+            const container = document.getElementById('m3-steps-container');
+            container.innerHTML = '';
+            const steps = m3Data[m3CurrentEx].steps;
+            
+            steps.forEach((step, i) => {
+                setTimeout(() => {
+                    const div = document.createElement('div');
+                    div.className = 'step-container pixel-border';
+                    div.style.display = 'block';
+                    div.textContent = `Paso ${i+1}: ${step}`;
+                    container.appendChild(div);
+                    
+                    if(i === steps.length - 1) {
+                        setTimeout(() => {
+                            document.getElementById('m3-decision').style.display = 'block';
+                        }, 500);
+                    }
+                }, i * 1000); // 1 sec delay per step
+            });
+        }
+
+        function m3CheckAnswer(userSaysTrue) {
+            const isTrue = m3Data[m3CurrentEx].isTrue;
+            const fb = document.getElementById('m3-feedback');
+            document.getElementById('m3-decision').style.display = 'none';
+
+            if (userSaysTrue === isTrue) {
+                fb.textContent = "¡Análisis Correcto! Eres un buen inspector.";
+                fb.className = 'feedback-box pixel-border success';
+            } else {
+                fb.textContent = "¡Error de Inspección! Revisa bien los números del último paso.";
+                fb.className = 'feedback-box pixel-border error';
+            }
+        }
+
+
+        // =========================================
+        // DATOS Y LÓGICA: MÓDULO 4 (DESAFÍO FINAL)
+        // =========================================
+        const m4Bank = [
+            { q: "Traduce: 'El doble de un número menos tres'", o: ["2x - 3", "x - 3", "2(x-3)"], a: 0 },
+            { q: "En la ecuación 'x + 8 = 20', el 8 pasa al otro lado a:", o: ["Sumar", "Restar", "Dividir"], a: 1 },
+            { q: "CRÍTICO: En '-5x = 30', ¿cómo pasa el -5 al otro lado?", o: ["A sumar (+5)", "A dividir como +5", "A dividir como -5"], a: 2 },
+            { q: "Resuelve: 3x = 12", o: ["x = 4", "x = 9", "x = -4"], a: 0 },
+            { q: "En '4x = 2x + 10', al pasar el 2x a la izquierda queda:", o: ["4x + 2x = 10", "4x - 2x = 10", "2x - 4x = 10"], a: 1 },
+            { q: "¿Es x = 3 solución de '2x + 4 = 10'?", o: ["Sí", "No"], a: 0 },
+            { q: "CRÍTICO: En '-x = 7', el valor de x es:", o: ["x = 7", "x = -7", "x = 0"], a: 1 },
+            { q: "Traduce: 'La suma de dos números consecutivos es 15'", o: ["x + y = 15", "x + x + 1 = 15", "2x = 15"], a: 1 }
+        ];
+
+        let m4Questions = [];
+        let m4Current = 0;
+        let m4Score = 0;
+        let m4StudentName = "";
+        let m4Report = [];
+
+        function startExam() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            if(!nameInput) {
+                alert("¡Necesitas ingresar tu nombre para empezar!");
+                return;
+            }
+            m4StudentName = nameInput;
+            m4Questions = [...m4Bank]; // Use all 8
+            m4Current = 0;
+            m4Score = 0;
+            m4Report = [];
+            
+            document.getElementById('m4-start-screen').style.display = 'none';
+            document.getElementById('m4-exam-screen').style.display = 'block';
+            
+            loadM4Question();
+        }
+
+        function loadM4Question() {
+            document.getElementById('m4-next-btn').style.display = 'none';
+            document.getElementById('m4-feedback').style.display = 'none';
+            
+            // Update HUD
+            document.getElementById('hud-qnum').textContent = m4Current + 1;
+            document.getElementById('hud-xp').style.width = `${(m4Current / m4Questions.length) * 100}%`;
+            document.getElementById('hud-score').textContent = m4Score;
+
+            const qData = m4Questions[m4Current];
+            document.getElementById('m4-question-text').textContent = qData.q;
+            
+            const optionsContainer = document.getElementById('m4-options');
+            optionsContainer.innerHTML = '';
+            
+            qData.o.forEach((optText, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn pixel-border';
+                btn.textContent = optText;
+                btn.onclick = () => answerM4(index, btn, optText);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function answerM4(selectedIndex, btnEl, optText) {
+            // Lock answers
+            document.querySelectorAll('#m4-options .option-btn').forEach(b => b.style.pointerEvents = 'none');
+            
+            const qData = m4Questions[m4Current];
+            const isCorrect = (selectedIndex === qData.a);
+            
+            // Save for report
+            m4Report.push({
+                q: qData.q,
+                userAns: optText,
+                status: isCorrect ? '✅ Correcto' : '❌ Incorrecto'
+            });
+
+            const fb = document.getElementById('m4-feedback');
+            
+            if(isCorrect) {
+                btnEl.style.backgroundColor = 'var(--mc-grass)';
+                fb.textContent = "¡Respuesta Correcta! +1 Diamante 💎";
+                fb.className = 'feedback-box pixel-border success';
+                m4Score++;
+                document.getElementById('hud-score').textContent = m4Score;
+            } else {
+                btnEl.style.backgroundColor = 'var(--mc-redstone)';
+                // Highlight correct
+                document.querySelectorAll('#m4-options .option-btn')[qData.a].style.backgroundColor = 'var(--mc-grass)';
+                fb.textContent = "Respuesta Incorrecta.";
+                fb.className = 'feedback-box pixel-border error';
+            }
+            
+            document.getElementById('m4-next-btn').style.display = 'block';
+        }
+
+        function m4NextQuestion() {
+            m4Current++;
+            if(m4Current < m4Questions.length) {
+                loadM4Question();
+            } else {
+                showM4Report();
+            }
+        }
+
+        function showM4Report() {
+            document.getElementById('m4-exam-screen').style.display = 'none';
+            document.getElementById('m4-result-screen').style.display = 'block';
+            
+            // Calculate grade (1.0 to 5.0)
+            let grade = (m4Score / m4Questions.length) * 4.0 + 1.0;
+            grade = grade.toFixed(1);
+            
+            document.getElementById('rep-name').textContent = "Estudiante: " + m4StudentName;
+            document.getElementById('rep-grade').textContent = grade;
+            
+            const msgEl = document.getElementById('rep-msg');
+            if(grade >= 4.0) { msgEl.textContent = "¡Excelente trabajo! Eres un Maestro Craftero del Álgebra."; msgEl.style.color = "var(--mc-grass)"; }
+            else if(grade >= 3.0) { msgEl.textContent = "¡Bien hecho! Aprobaste, pero sigue practicando tus crafteos."; msgEl.style.color = "#000"; }
+            else { msgEl.textContent = "Necesitas repasar el manual de crafteo (¡Ojo con los signos!)."; msgEl.style.color = "var(--mc-redstone)"; }
+            
+            const tbody = document.getElementById('rep-tbody');
+            tbody.innerHTML = '';
+            m4Report.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${item.q}</td><td>${item.userAns}</td><td style="font-weight:bold;">${item.status}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // =========================================
+        // INICIALIZACIÓN
+        // =========================================
+        window.onload = () => {
+            renderM1Nav();
+            renderM2Nav();
+            renderM3Nav();
+        };
+    </script>
+</body>
+</html>

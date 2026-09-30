@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tercera Ley de Newton - Simulador</title>
+    <style>
+        /* Variables y Reset */
+        :root {
+            --primary: #2C3E50;
+            --secondary: #3498DB;
+            --accent: #27AE60;
+            --danger: #E74C3C;
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-dark: #333333;
+            --text-light: #7F8C8D;
+            --border-radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Encabezado Institucional */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        header h2 {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            font-weight: 400;
+        }
+
+        /* Navegación por Pestañas */
+        nav {
+            display: flex;
+            justify-content: center;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--secondary);
+        }
+
+        .tab-btn.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+
+        /* Contenedores de Módulos */
+        main {
+            flex-grow: 1;
+            padding: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .module {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .module.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* UI Elementos Generales */
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .btn:hover {
+            background-color: #2980B9;
+        }
+
+        .btn-action {
+            background-color: var(--accent);
+            font-size: 1.1rem;
+            padding: 0.8rem 1.5rem;
+        }
+        
+        .btn-action:hover {
+            background-color: #219653;
+        }
+
+        .btn-danger { background-color: var(--text-light); }
+        .btn-danger:hover { background-color: #636e72; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Módulo 1: Simulación */
+        .sim-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            background: #E0F7FA;
+            border-radius: var(--border-radius);
+            border: 2px solid #B2EBF2;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* Módulo 2: Votación */
+        .poll-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .poll-grid { grid-template-columns: 1fr; }
+        }
+
+        .poll-question {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .poll-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+
+        .poll-btn {
+            flex: 0 0 40px;
+            height: 40px;
+            border-radius: 4px;
+            border: none;
+            background: #EDF2F7;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+            z-index: 2;
+            transition: background 0.2s;
+        }
+
+        .poll-btn:hover { background: #E2E8F0; }
+
+        .poll-bar-container {
+            flex-grow: 1;
+            background: #F1F5F9;
+            height: 40px;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            z-index: 1;
+        }
+
+        .poll-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: #A0AEC0;
+            width: 0%;
+            transition: width 0.5s ease-out;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .poll-text {
+            font-size: 0.9rem;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .poll-pct {
+            position: absolute;
+            right: 10px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #E8F8F5;
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        /* Módulo 3: Analogías */
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .analogy-title {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>La Tercera Ley de Newton: Acción y Reacción</h1>
+        <h2>IE Miguel Antonio Caro - Ciencias Naturales 10°</h2>
+    </header>
+
+    <nav>
+        <button class="tab-btn active" onclick="switchTab('mod1', this)">1. La Simulación</button>
+        <button class="tab-btn" onclick="switchTab('mod2', this)">2. Votación en Clase</button>
+        <button class="tab-btn" onclick="switchTab('mod3', this)">3. Entorno Cotidiano</button>
+    </nav>
+
+    <main>
+        <!-- MÓDULO 1: SIMULACIÓN -->
+        <section id="mod1" class="module active">
+            <div class="card">
+                <div class="sim-header">
+                    <p style="font-size: 1.1rem;"><strong>Caso de Estudio:</strong> Valentina (45 kg) y Mateo (75 kg) están inmóviles en patines sobre una pista sin fricción. <br>De repente, <strong>Valentina empuja a Mateo</strong> hacia adelante con sus brazos.</p>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="simCanvas" width="800" height="300"></canvas>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-action" id="btnPush" onclick="triggerPush()">¡Valentina empuja a Mateo!</button>
+                    <button class="btn btn-danger" onclick="resetSim()">Reiniciar Escena</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MÓDULO 2: VOTACIÓN -->
+        <section id="mod2" class="module">
+            <div class="poll-grid">
+                
+                <!-- Pregunta 1 -->
+                <div class="card">
+                    <div class="poll-question">1. ¿Quién se mueve después del empujón?</div>
+                    
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q1', 'A')">A</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q1-A"></div>
+                            <span class="poll-text">Solo Mateo (Valentina lo empujó)</span>
+                            <span class="poll-pct" id="pct-q1-A">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q1', 'B')">B</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q1-B"></div>
+                            <span class="poll-text">Solo Valentina (retrocede)</span>
+                            <span class="poll-pct" id="pct-q1-B">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q1', 'C')">C</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q1-C" style="background-color: var(--accent);"></div>
+                            <span class="poll-text">Se mueven ambos en sentidos opuestos</span>
+                            <span class="poll-pct" id="pct-q1-C">0%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="toggleExp('exp1')" style="margin-top: 10px; width: 100%;">Revelar Explicación Física</button>
+                    <div id="exp1" class="explanation">
+                        <strong>Correcta: C.</strong> Al ejercer una fuerza (Acción) sobre Mateo, Valentina recibe simultáneamente una fuerza de igual magnitud pero en sentido opuesto (Reacción). Al no haber fricción, ambos se moverán.
+                    </div>
+                </div>
+
+                <!-- Pregunta 2 -->
+                <div class="card">
+                    <div class="poll-question">2. Sobre la intensidad de las fuerzas aplicadas:</div>
+                    
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q2', 'A')">A</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q2-A"></div>
+                            <span class="poll-text">La fuerza que recibe Mateo es mayor.</span>
+                            <span class="poll-pct" id="pct-q2-A">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q2', 'B')">B</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q2-B"></div>
+                            <span class="poll-text">La fuerza que recibe Valentina es mayor.</span>
+                            <span class="poll-pct" id="pct-q2-B">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q2', 'C')">C</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q2-C" style="background-color: var(--accent);"></div>
+                            <span class="poll-text">Ambas fuerzas son exactamente iguales.</span>
+                            <span class="poll-pct" id="pct-q2-C">0%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="toggleExp('exp2')" style="margin-top: 10px; width: 100%;">Revelar Explicación Física</button>
+                    <div id="exp2" class="explanation">
+                        <strong>Correcta: C.</strong> Según la 3ra Ley de Newton, las fuerzas de acción y reacción son un par que aparece simultáneamente y tienen <em>exactamente la misma magnitud</em> en todo momento, sin importar quién sea más fuerte o más pesado.
+                    </div>
+                </div>
+
+                <!-- Pregunta 3 -->
+                <div class="card">
+                    <div class="poll-question">3. ¿Quién se moverá con mayor rapidez?</div>
+                    
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q3', 'A')">A</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q3-A"></div>
+                            <span class="poll-text">Mateo irá más rápido (empujado).</span>
+                            <span class="poll-pct" id="pct-q3-A">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q3', 'B')">B</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q3-B" style="background-color: var(--accent);"></div>
+                            <span class="poll-text">Valentina irá más rápida (retroceso).</span>
+                            <span class="poll-pct" id="pct-q3-B">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q3', 'C')">C</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q3-C"></div>
+                            <span class="poll-text">Ambos irán a la misma rapidez.</span>
+                            <span class="poll-pct" id="pct-q3-C">0%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="toggleExp('exp3')" style="margin-top: 10px; width: 100%;">Revelar Explicación Física</button>
+                    <div id="exp3" class="explanation">
+                        <strong>Correcta: B.</strong> Combinamos con la 2da Ley ($a = F/m$). Como la fuerza es la misma para ambos, el cuerpo con menor masa (Valentina, 45 kg) experimentará una mayor aceleración y por ende, mayor rapidez que Mateo (75 kg).
+                    </div>
+                </div>
+
+                <!-- Pregunta 4 -->
+                <div class="card">
+                    <div class="poll-question">4. Si las fuerzas son iguales y opuestas, ¿por qué no se cancelan y evitan el movimiento?</div>
+                    
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q4', 'A')">A</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q4-A"></div>
+                            <span class="poll-text">Porque actúan en tiempos diferentes.</span>
+                            <span class="poll-pct" id="pct-q4-A">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q4', 'B')">B</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q4-B" style="background-color: var(--accent);"></div>
+                            <span class="poll-text">Porque actúan sobre cuerpos diferentes.</span>
+                            <span class="poll-pct" id="pct-q4-B">0%</span>
+                        </div>
+                    </div>
+                    <div class="poll-option">
+                        <button class="poll-btn" onclick="vote('q4', 'C')">C</button>
+                        <div class="poll-bar-container">
+                            <div class="poll-bar-fill" id="bar-q4-C"></div>
+                            <span class="poll-text">Sí se cancelan, pero el patín ayuda.</span>
+                            <span class="poll-pct" id="pct-q4-C">0%</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" onclick="toggleExp('exp4')" style="margin-top: 10px; width: 100%;">Revelar Explicación Física</button>
+                    <div id="exp4" class="explanation">
+                        <strong>Correcta: B.</strong> El error más común. Las fuerzas se cancelarían si se aplicaran <em>sobre el mismo objeto</em>. Pero aquí, la fuerza de acción empuja a Mateo y la de reacción empuja a Valentina. Cada cuerpo se mueve según la única fuerza que recibe.
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- MÓDULO 3: ANALOGÍAS COTIDIANAS -->
+        <section id="mod3" class="module">
+            <div class="analogy-grid">
+                
+                <div class="card">
+                    <h3 class="analogy-title">Analogía 1: El salto desde la canoa en el río</h3>
+                    <p>Imagina que estás parado en una canoa suelta cerca a la orilla del río. Quieres saltar hacia la tierra firme, así que te impulsas hacia adelante.</p>
+                    <button class="btn" onclick="toggleExp('ana1')" style="margin-top: 10px;">Ver Analogía Científica</button>
+                    <div id="ana1" class="explanation">
+                        <strong>Acción y Reacción en el agua:</strong> Al impulsarte hacia adelante (acción), tus pies empujan la canoa hacia atrás con la misma fuerza (reacción). Como la canoa está en el agua (poca fricción), sale disparada hacia el centro del río, y tú podrías no alcanzar la orilla si no consideraste que la canoa se movería.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="analogy-title">Analogía 2: El trabajo en el campo (Manguera de presión)</h3>
+                    <p>En actividades agropecuarias, al abrir bruscamente la válvula de una manguera de muy alta presión para lavar instalaciones o fumigar cultivos, sientes un "jalón".</p>
+                    <button class="btn" onclick="toggleExp('ana2')" style="margin-top: 10px;">Ver Analogía Científica</button>
+                    <div id="ana2" class="explanation">
+                        <strong>Retroceso por expulsión:</strong> La manguera ejerce una gran fuerza para acelerar y expulsar el agua hacia adelante (Acción). El agua expulsada ejerce exactamente la misma fuerza hacia atrás sobre la manguera y tus manos (Reacción). Esto es el mismo principio del retroceso ("pateo") de una escopeta.
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Navegación de Pestañas
+        function switchTab(modId, btn) {
+            document.querySelectorAll('.module').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(modId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // Mostrar/Ocultar explicaciones
+        function toggleExp(id) {
+            const el = document.getElementById(id);
+            if(el.style.display === 'block') {
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'block';
+            }
+        }
+
+        /* ----------------------------------------------------
+           LÓGICA DEL SIMULADOR (CANVAS)
+           ---------------------------------------------------- */
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Estado de la simulación
+        let simState = 'idle'; // idle, pushing, moving
+        let pushTimer = 0;
+        let lastTime = 0;
+        let animationId;
+
+        // Entidades
+        const patinH = 10;
+        const val = { x: 0, y: 180, radius: 25, mass: 45, v: 0, color: '#E74C3C', name: 'Valentina', labelX: -20, massL: '45 kg' };
+        const mat = { x: 0, y: 180, radius: 35, mass: 75, v: 0, color: '#3498DB', name: 'Mateo', labelX: 10, massL: '75 kg' };
+        
+        // Física
+        const forceMagnitude = 600; // Unidad arbitraria para visual
+        
+        function resetSim() {
+            simState = 'idle';
+            pushTimer = 0;
+            // Posiciones iniciales (centro del canvas)
+            val.x = canvas.width / 2 - 40;
+            mat.x = canvas.width / 2 + 40;
+            val.v = 0;
+            mat.v = 0;
+            document.getElementById('btnPush').disabled = false;
+            
+            if(!animationId) {
+                lastTime = performance.now();
+                animate(lastTime);
+            }
+        }
+
+        function triggerPush() {
+            if(simState !== 'idle') return;
+            simState = 'pushing';
+            pushTimer = 1000; // Mostrar fuerza durante 1 segundo
+            document.getElementById('btnPush').disabled = true;
+            
+            // a = F/m. (v = a*t). Asumimos impulso instantáneo para la v final.
+            // La relación de velocidades es inversamente proporcional a la masa
+            // m1*v1 = -m2*v2 (Conservación momento)
+            const momentum = 150; 
+            val.v = -(momentum / val.mass); // va hacia la izquierda (-)
+            mat.v = (momentum / mat.mass);  // va hacia la derecha (+)
+        }
+
+        function drawEntity(ent) {
+            // Ruedas patines
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(ent.x - 15, ent.y + ent.radius + patinH, 6, 0, Math.PI*2);
+            ctx.arc(ent.x + 15, ent.y + ent.radius + patinH, 6, 0, Math.PI*2);
+            ctx.fill();
+            
+            // Tabla patín
+            ctx.fillStyle = '#7F8C8D';
+            ctx.fillRect(ent.x - 25, ent.y + ent.radius, 50, patinH);
+
+            // Cuerpo (Círculo)
+            ctx.fillStyle = ent.color;
+            ctx.beginPath();
+            ctx.arc(ent.x, ent.y, ent.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#2C3E50';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Texto Nombre y Masa
+            ctx.fillStyle = '#2C3E50';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(ent.name, ent.x, ent.y - ent.radius - 25);
+            ctx.font = '14px sans-serif';
+            ctx.fillText(ent.massL, ent.x, ent.y - ent.radius - 8);
+        }
+
+        function drawArrow(fromX, fromY, toX, toY, color, label) {
+            const headlen = 10;
+            const dx = toX - fromX;
+            const dy = toY - fromY;
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            
+            // Cabeza
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.fill();
+
+            // Etiqueta
+            ctx.fillStyle = color;
+            ctx.font = 'bold 14px sans-serif';
+            ctx.fillText(label, fromX + dx/2, fromY - 10);
+        }
+
+        function animate(timestamp) {
+            const dt = timestamp - lastTime;
+            lastTime = timestamp;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Suelo
+            ctx.fillStyle = '#BDC3C7';
+            ctx.fillRect(0, 230, canvas.width, 70);
+            
+            // Lógica de estados
+            if (simState === 'pushing') {
+                pushTimer -= dt;
+                
+                // Dibujar Vectores de Fuerza de Acción y Reacción
+                // Fuerza sobre Mateo (Acción) - Flecha hacia la derecha
+                drawArrow(mat.x - 10, mat.y, mat.x + 80, mat.y, '#E67E22', 'F (Acción)');
+                // Fuerza sobre Valentina (Reacción) - Flecha hacia la izquierda
+                drawArrow(val.x + 10, val.y, val.x - 80, val.y, '#9B59B6', 'F (Reacción)');
+                
+                if(pushTimer <= 0) {
+                    simState = 'moving';
+                }
+            } else if (simState === 'moving') {
+                // Actualizar posiciones (v está en px/10ms aprox)
+                const speedMult = dt * 0.05;
+                val.x += val.v * speedMult;
+                mat.x += mat.v * speedMult;
+                
+                // Detener si salen de pantalla por mucho
+                if(val.x < -100 && mat.x > canvas.width + 100) {
+                    // Mantiene el loop pero no calcula más
+                }
+            }
+
+            drawEntity(val);
+            drawEntity(mat);
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Inicializar canvas
+        resetSim();
+
+
+        /* ----------------------------------------------------
+           LÓGICA DEL SISTEMA DE VOTACIÓN
+           ---------------------------------------------------- */
+        const votes = {
+            q1: { A: 0, B: 0, C: 0, total: 0 },
+            q2: { A: 0, B: 0, C: 0, total: 0 },
+            q3: { A: 0, B: 0, C: 0, total: 0 },
+            q4: { A: 0, B: 0, C: 0, total: 0 }
+        };
+
+        function vote(qId, opt) {
+            votes[qId][opt]++;
+            votes[qId].total++;
+            updateBars(qId);
+        }
+
+        function updateBars(qId) {
+            const t = votes[qId].total;
+            if(t === 0) return;
+            
+            ['A', 'B', 'C'].forEach(opt => {
+                const count = votes[qId][opt];
+                const pct = Math.round((count / t) * 100);
+                
+                const bar = document.getElementById(`bar-${qId}-${opt}`);
+                const txt = document.getElementById(`pct-${qId}-${opt}`);
+                
+                bar.style.width = pct + '%';
+                // Si la barra supera el 10%, subir opacidad para que se vea sólida
+                bar.style.opacity = pct > 0 ? "0.8" : "0.3"; 
+                txt.innerText = pct + '%';
+            });
+        }
+    </script>
+</body>
+</html>

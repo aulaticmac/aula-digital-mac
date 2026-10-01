@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>¡COMPRUEBA TU PROGRAMA!</title>
+<style>
+:root{--bg:#eef4f8;--panel:#fff;--ink:#173042;--muted:#5d7180;--line:#d5e1e8;--green:#2e9d68;--blue:#277bbd;--orange:#e58a28;--red:#d9534f;--purple:#7656b5;--shadow:0 10px 28px rgba(23,48,66,.1)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;background:linear-gradient(#f7fbfd,#eef4f8);color:var(--ink);line-height:1.45}button,textarea{font:inherit}button{cursor:pointer}.app{max-width:1400px;margin:auto;padding:18px}
+header,.panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}header{padding:22px 24px;margin-bottom:14px}.brand{display:flex;gap:14px;align-items:flex-start}.logo{width:52px;height:52px;border-radius:15px;background:linear-gradient(135deg,#287cba,#2e9d68);display:grid;place-items:center;color:white;font-weight:900;font-size:21px;flex:none}.eyebrow{font-weight:800;color:var(--blue);font-size:.82rem;letter-spacing:.04em}h1{margin:2px 0 4px;font-size:clamp(1.7rem,3vw,2.5rem);line-height:1.05}.subtitle{margin:0;color:var(--muted)}.top-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.btn{border:1px solid var(--line);background:white;color:var(--ink);border-radius:12px;padding:10px 14px;font-weight:800}.btn:hover{filter:brightness(.98)}.btn.primary{background:var(--blue);color:white;border-color:var(--blue)}.btn.success{background:var(--green);color:white;border-color:var(--green)}.btn.warn{background:#fff5e5;border-color:#efc078;color:#7b4c14}.btn.danger{background:#fff0ef;border-color:#eeaaa6;color:#9b2c28}.btn.small{padding:8px 11px;font-size:.9rem}
+.mission{display:flex;align-items:center;gap:5px;margin-top:15px;overflow:auto;padding-bottom:3px}.step{white-space:nowrap;padding:8px 12px;border-radius:999px;background:#edf3f6;color:#71808b;font-weight:800;font-size:.88rem}.step.active{background:#dceff8;color:#17689e}.arrow{color:#91a0aa;font-weight:900}.notice{margin-top:14px;padding:11px 14px;border-radius:12px;background:#f0f7fb;border:1px solid #cfe2ed;color:#315468;font-size:.92rem}
+main{display:grid;gap:14px}.panel{padding:20px}.panel h2{margin:0 0 6px;font-size:1.35rem}.lead{margin:0 0 15px;color:var(--muted)}.order-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px}.slot{min-height:88px;border:2px dashed #b9cbd5;border-radius:15px;background:#f8fbfc;padding:9px;display:flex;align-items:center;gap:9px}.slot.over{border-color:var(--blue);background:#edf7fc}.slot-num{width:32px;height:32px;border-radius:10px;background:#e7eef2;display:grid;place-items:center;font-weight:900;flex:none}.slot .card{flex:1;min-width:0}.placeholder{color:#8797a1;font-weight:800;font-size:.9rem}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}.return-zone{margin-top:10px;border:2px dashed #c5d2d9;border-radius:13px;background:#f7fafb;padding:11px 13px;display:flex;align-items:center;gap:10px;color:#5d7180}.return-zone span{font-size:.85rem}.return-zone.over{border-color:var(--purple);background:#f4effb;color:#5e438e}
+.observe-next,.experiment-next{margin-top:14px;padding:13px 15px;border:1px solid #cfe0e8;border-radius:14px;background:#f4f9fb;display:flex;align-items:center;justify-content:space-between;gap:12px}.observe-next p,.experiment-next p{margin:0;color:#405d6c}.observe-next button,.experiment-next button{flex:none}
+.touch-ghost{position:fixed;z-index:9999;pointer-events:none;transform:translate(-50%,-50%) rotate(2deg);width:min(300px,70vw);opacity:.92;box-shadow:0 18px 35px rgba(23,48,66,.22)}
+.card{border:1px solid var(--line);border-left:7px solid var(--blue);background:#fff;border-radius:14px;padding:12px;box-shadow:0 5px 15px rgba(23,48,66,.06);touch-action:none;user-select:none}.card[draggable=true]{cursor:grab}.card.dragging{opacity:.45}.card-head{display:flex;gap:9px;align-items:center;margin-bottom:5px}.tag{font-size:.72rem;font-weight:900;padding:4px 7px;border-radius:999px;background:#edf2f5;color:#4e6370}.icon{width:31px;height:31px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:900;flex:none}.card p{margin:0;font-weight:700;font-size:.94rem;overflow-wrap:anywhere}.c-inicio{border-left-color:var(--green)}.c-inicio .icon{background:var(--green)}.c-ubicacion{border-left-color:#637f93}.c-ubicacion .icon{background:#637f93}.c-movimiento{border-left-color:var(--blue)}.c-movimiento .icon{background:var(--blue)}.c-repetir{border-left-color:var(--orange)}.c-repetir .icon{background:var(--orange)}.c-comprobar{border-left-color:#4aa7d8}.c-comprobar .icon{background:#4aa7d8}.c-condicion{border-left-color:#d96b83}.c-condicion .icon{background:#d96b83}.c-contagio{border-left-color:var(--red)}.c-contagio .icon{background:var(--red)}.c-continuar{border-left-color:var(--purple)}.c-continuar .icon{background:var(--purple)}
+.controls,.sim-controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}.feedback{margin-top:14px;border-radius:15px;padding:15px;display:none}.feedback.show{display:block}.feedback.error{background:#fff4f2;border:1px solid #f0b8b3}.feedback.ok{background:#eefaf4;border:1px solid #b7dfca}.feedback h3{margin:0 0 4px}.feedback p{margin:4px 0 10px}.hint{font-weight:800;color:#684d16}.sim-section{display:none}.sim-section.show{display:block}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}.stat{border:1px solid var(--line);border-radius:13px;padding:10px;background:#f8fbfc}.stat b{display:block;font-size:1.18rem}.stat span{color:var(--muted);font-size:.78rem;font-weight:800}canvas{width:100%;height:430px;display:block;border-radius:18px;background:#f4f8fa;border:1px solid var(--line)}
+.experiment,.reflection{display:none;margin-top:14px}.experiment.show,.reflection.show{display:block}.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.control-box{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fbfdfe}.control-box h4{margin:0 0 9px}.stepper{display:flex;align-items:center;gap:10px}.stepper button{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:1.2rem;font-weight:900}.value{min-width:45px;text-align:center;font-size:1.15rem;font-weight:900}.speeds{display:flex;gap:6px;flex-wrap:wrap}.speed.active{background:#e6f3fb;border-color:#9ac8e4;color:#155f8d}.questions{display:grid;gap:10px}.q{border:1px solid var(--line);border-radius:14px;padding:12px}.q label{font-weight:800;display:block;margin-bottom:7px}.q textarea{width:100%;min-height:75px;border:1px solid #cbd9e1;border-radius:10px;padding:9px;resize:vertical}.mission-done{display:none;margin-top:12px;padding:14px;border-radius:14px;background:#eefaf4;border:1px solid #b8ddc9;font-weight:800}footer{padding:18px 4px;text-align:center;color:#73848e;font-size:.82rem}
+body.projection{font-size:1.1rem}body.projection .app{max-width:1600px;padding:26px}body.projection .panel,body.projection header{box-shadow:0 12px 34px rgba(23,48,66,.14)}body.projection .panel{padding:27px}body.projection .card{padding:17px}body.projection .card p{font-size:1.05rem}body.projection .slot{min-height:105px}body.projection .btn{padding:13px 17px}body.projection canvas{height:540px}body.projection h1{font-size:3rem}
+@media(max-width:900px){.order-layout{grid-template-columns:1fr}.ex-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.cards{grid-template-columns:1fr}.app{padding:10px}header,.panel{padding:15px}.brand{flex-wrap:wrap}.top-actions{margin-left:0;width:100%;justify-content:flex-start}.slots{grid-template-columns:1fr}.slot{min-height:78px}canvas{height:320px}.stats{grid-template-columns:1fr 1fr}.arrow{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand">
+  <div class="logo" aria-hidden="true">JS</div>
+  <div><div class="eyebrow">MISIÓN DE PROGRAMACIÓN · SIMULACIÓN</div><h1>¡COMPRUEBA TU PROGRAMA!</h1><p class="subtitle">¿Lograste reconstruir correctamente la lógica de la simulación?</p></div>
+  <div class="top-actions"><button class="btn small" id="projectionBtn">Modo proyección</button><button class="btn small danger" id="resetAllBtn">↻ Reiniciar actividad</button></div>
+ </div>
+ <div class="mission" aria-label="Ruta de la misión"><div class="step active" id="m1">1 · ORDENAR</div><span class="arrow">→</span><div class="step" id="m2">2 · COMPROBAR</div><span class="arrow">→</span><div class="step" id="m3">3 · EJECUTAR</div><span class="arrow">→</span><div class="step" id="m4">4 · EXPERIMENTAR</div></div>
+ <div class="notice"><strong>Recuerda:</strong> primero recupera lo aprendido, formula una hipótesis, construye la secuencia y después ejecútala. Estas ocho instrucciones son una representación didáctica simplificada de la lógica del programa original de Scratch; no son una transcripción literal de sus bloques.</div>
+</header>
+<main>
+<section class="panel" id="orderingPanel">
+ <h2>1. Construye el algoritmo</h2><p class="lead">Arrastra las tarjetas y colócalas en el orden que consideres correcto. Puedes moverlas tantas veces como necesites.</p>
+ <div class="order-layout"><div><div class="slots" id="slots"></div>
+  <div class="return-zone" id="returnZone" aria-label="Zona para devolver tarjetas">
+   <strong>↩ DEVOLVER TARJETAS AQUÍ</strong>
+   <span>Arrastra una tarjeta hasta esta zona para sacarla de la secuencia y devolverla al banco.</span>
+  </div>
+  <div class="controls"><button class="btn primary" id="runBtn">▶ EJECUTAR PROGRAMA</button></div>
+  <div class="feedback error" id="errorFeedback"><h3>⚠ Hay un problema en el programa</h3><p>Algunas instrucciones todavía no están en el orden necesario para que la simulación funcione.</p><p class="hint" id="hintText"></p><button class="btn warn" id="reviewBtn">🔧 REVISAR MI PROGRAMA</button></div>
+  <div class="feedback ok" id="successFeedback"><h3>🎉 ¡PROGRAMA CORRECTO!</h3>
+   <p>¡Muy bien! Reconstruiste la lógica del programa.</p>
+   <p><strong>Ahora observa cómo las instrucciones que ordenaste producen un comportamiento en la simulación.</strong></p>
+   <button class="btn success" id="simBtn">▶ EJECUTAR SIMULACIÓN</button></div>
+ </div><aside><h3 style="margin-top:0">Tarjetas desordenadas</h3><div class="cards" id="cardBank"></div><p style="color:var(--muted);font-size:.9rem">Consejo: piensa qué acciones deben suceder antes de comprobar un contacto y qué debe repetirse después.</p></aside></div>
+</section>
+<section class="panel sim-section" id="simPanel">
+ <h2>2. Ejecuta y observa</h2><p class="lead">La simulación es una representación educativa simplificada: no pretende modelar científicamente una epidemia real.</p>
+ <div class="stats"><div class="stat"><b id="healthy">0</b><span>SANAS</span></div><div class="stat"><b id="infected">0</b><span>INFECTADAS</span></div><div class="stat"><b id="total">0</b><span>TOTAL</span></div><div class="stat"><b id="time">0.0 s</b><span>TIEMPO</span></div></div>
+ <canvas id="simCanvas" aria-label="Escenario de simulación de propagación por contacto"></canvas>
+ <div class="sim-controls"><button class="btn warn" id="pauseBtn">⏸ PAUSAR</button><button class="btn" id="continueBtn">▶ CONTINUAR</button><button class="btn danger" id="restartSimBtn">↻ REINICIAR</button></div>
+ <div class="observe-next" id="observeNext"><p><strong>Observa primero:</strong> ¿cómo cambia el escenario cuando ocurre un contacto?</p><button class="btn primary" id="experimentBtn">🧪 QUIERO EXPERIMENTAR</button></div>
+ <div class="experiment" id="experiment"><h2 style="margin-top:22px">3. ¿Qué pasaría si...?</h2><p class="lead">Cambia una condición y vuelve a experimentar. Cada prueba comienza desde cero.</p>
+  <div class="ex-grid"><div class="control-box"><h4>Personas sanas</h4><div class="stepper"><button data-key="healthy" data-delta="-1">−</button><div class="value" id="healthyCfg">10</div><button data-key="healthy" data-delta="1">+</button></div></div>
+  <div class="control-box"><h4>Infectadas iniciales</h4><div class="stepper"><button data-key="infected" data-delta="-1">−</button><div class="value" id="infectedCfg">1</div><button data-key="infected" data-delta="1">+</button></div></div>
+  <div class="control-box"><h4>Velocidad</h4><div class="speeds"><button class="btn small speed" data-speed=".65">LENTA</button><button class="btn small speed active" data-speed="1">NORMAL</button><button class="btn small speed" data-speed="1.45">RÁPIDA</button></div></div></div>
+  <div class="controls"><button class="btn primary" id="tryAgainBtn">🔄 PROBAR DE NUEVO</button></div>
+   <div class="experiment-next"><p><strong>¿Ya hiciste una prueba?</strong> Explica ahora qué observaste y qué hipótesis cambió o se confirmó.</p><button class="btn success" id="reflectionBtn">🧠 QUIERO REFLEXIONAR</button></div>
+ </div>
+ <div class="reflection" id="reflection"><h2 style="margin-top:22px">4. Reflexiona sobre tu experimento</h2><div class="questions">
+  <div class="q"><label for="q1">1. ¿Qué ocurrió cuando la bolita roja tocó una verde?</label><textarea id="q1"></textarea></div>
+  <div class="q"><label for="q2">2. ¿Qué instrucción del programa permite representar el contagio?</label><textarea id="q2"></textarea></div>
+  <div class="q"><label for="q3">3. ¿Qué crees que ocurriría si hubiera más personas infectadas al comienzo?</label><textarea id="q3"></textarea></div>
+ </div><div class="controls"><button class="btn success" id="finishBtn">✓ TERMINÉ MI MISIÓN</button></div><div class="mission-done" id="doneMsg">Misión completada. Guarda tus respuestas o compártelas con tu docente para conversar sobre el algoritmo, la simulación y tus hipótesis.</div></div>
+</section>
+</main><footer>Actividad interactiva offline · Programación y pensamiento algorítmico · No se registra ni envía información por Internet.</footer>
+</div>
+<script>
+"use strict";
+const I=[
+{id:"start",tag:"INICIO",icon:"▶",text:"Comenzar el programa.",c:"c-inicio"},
+{id:"locate",tag:"UBICACIÓN",icon:"⌖",text:"Ubicarse en un lugar de inicio.",c:"c-ubicacion"},
+{id:"move",tag:"MOVIMIENTO",icon:"➜",text:"Comenzar a moverse por el escenario.",c:"c-movimiento"},
+{id:"repeat",tag:"REPETIR",icon:"↻",text:"Repetir el movimiento continuamente.",c:"c-repetir"},
+{id:"check",tag:"COMPROBAR",icon:"◉",text:"Comprobar si está tocando el color rojo.",c:"c-comprobar"},
+{id:"condition",tag:"CONDICIÓN",icon:"?",text:"¿Está tocando el color rojo?",c:"c-condicion"},
+{id:"infect",tag:"CONTAGIO",icon:"●",text:"Si toca el rojo, cambiar a infectado.",c:"c-contagio"},
+{id:"continue",tag:"CONTINUAR",icon:"↺",text:"Seguir moviéndose y comprobar nuevamente.",c:"c-continuar"}];
+const $=id=>document.getElementById(id), correct=I.map(x=>x.id);
+let order=[null,null,null,null,null,null,null,null],dragged=null,hint=0,validated=false;
+let cfg={healthy:10,infected:1,speed:1},p=[],running=false,paused=false,elapsed=0,last=0,raf=0;
+function item(id){return I.find(x=>x.id===id)}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function makeCard(x){
+ const d=document.createElement("div");
+ d.className="card "+x.c;
+ d.draggable=true;
+ d.dataset.id=x.id;
+ d.tabIndex=0;
+ d.setAttribute("role","button");
+ d.innerHTML='<div class="card-head"><div class="icon" aria-hidden="true">'+x.icon+'</div><span class="tag">'+x.tag+'</span></div><p>'+x.text+'</p>';
+
+ d.addEventListener("dragstart",e=>{
+   dragged=x.id;
+   d.classList.add("dragging");
+   e.dataTransfer.effectAllowed="move";
+   e.dataTransfer.setData("text/plain",x.id);
+ });
+ d.addEventListener("dragend",()=>{
+   dragged=null;
+   d.classList.remove("dragging");
+   document.querySelectorAll(".slot").forEach(z=>z.classList.remove("over"));
+ });
+ d.addEventListener("keydown",e=>{
+   if(e.key==="Enter"||e.key===" "){
+     e.preventDefault();
+     const k=order.findIndex(v=>!v);
+     if(k>=0)place(x.id,k);
+   }
+ });
+ attachTouch(d);
+ return d;
+}
+function render(){
+ const bank=$("cardBank"), slotsEl=$("slots");
+ bank.innerHTML="";
+ slotsEl.innerHTML="";
+
+ // Always render every unplaced card in the bank.
+ I.filter(x=>!order.includes(x.id)).forEach(x=>bank.appendChild(makeCard(x)));
+
+ // Render exactly eight destination slots.
+ for(let i=0;i<8;i++){
+   const s=document.createElement("div");
+   s.className="slot";
+   s.dataset.i=i;
+   s.setAttribute("data-slot","true");
+   s.innerHTML='<div class="slot-num">'+(i+1)+'</div>';
+
+   if(order[i]){
+     s.appendChild(makeCard(item(order[i])));
+   }else{
+     s.insertAdjacentHTML("beforeend",'<span class="placeholder">ARRASTRA AQUÍ</span>');
+   }
+   slotsEl.appendChild(s);
+ }
+}
+function removeCardToBank(id){
+ const idx=order.indexOf(id);
+ if(idx>=0){
+   order[idx]=null;
+   render();
+ }
+}
+
+function place(id,i){
+ if(!id || !item(id) || i<0 || i>7)return;
+
+ const old=order.indexOf(id);
+ const displaced=order[i];
+
+ // If the card was already in another slot, clear that origin.
+ if(old>=0) order[old]=null;
+
+ // Put the dragged card in the requested destination.
+ order[i]=id;
+
+ // If the destination was occupied, move that card back to the
+ // previous origin when possible; otherwise it returns to the bank.
+ if(displaced && displaced!==id && old>=0){
+   order[old]=displaced;
+ }
+
+ render();
+}
+
+$("slots").addEventListener("dragover",e=>{
+ const slot=e.target.closest(".slot");
+ if(!slot)return;
+ e.preventDefault();
+ e.dataTransfer.dropEffect="move";
+ document.querySelectorAll(".slot").forEach(z=>z.classList.toggle("over",z===slot));
+});
+
+$("slots").addEventListener("dragleave",e=>{
+ const slot=e.target.closest(".slot");
+ if(slot && !slot.contains(e.relatedTarget))slot.classList.remove("over");
+});
+
+$("slots").addEventListener("drop",e=>{
+ e.preventDefault();
+ const slot=e.target.closest(".slot");
+ if(!slot)return;
+ const id=e.dataTransfer.getData("text/plain") || dragged;
+ if(id)place(id,Number(slot.dataset.i));
+ document.querySelectorAll(".slot").forEach(z=>z.classList.remove("over"));
+ dragged=null;
+});
+$("returnZone").addEventListener("dragover",e=>{
+ e.preventDefault();
+ e.dataTransfer.dropEffect="move";
+ $("returnZone").classList.add("over");
+});
+$("returnZone").addEventListener("dragleave",()=>$("returnZone").classList.remove("over"));
+$("returnZone").addEventListener("drop",e=>{
+ e.preventDefault();
+ const id=e.dataTransfer.getData("text/plain")||dragged;
+ if(id)removeCardToBank(id);
+ $("returnZone").classList.remove("over");
+ dragged=null;
+});
+let touchDrag={id:null,ghost:null,source:null,active:false};
+
+function beginTouchDrag(card,e){
+ if(e.pointerType==="mouse")return;
+ touchDrag.id=card.dataset.id;
+ touchDrag.source=card;
+ touchDrag.active=false;
+ clearTimeout(card._touchTimer);
+ card._touchTimer=setTimeout(()=>{
+   touchDrag.active=true;
+   card.setPointerCapture?.(e.pointerId);
+   card.classList.add("dragging");
+   const ghost=card.cloneNode(true);
+   ghost.classList.add("touch-ghost");
+   document.body.appendChild(ghost);
+   touchDrag.ghost=ghost;
+   moveTouchGhost(e.clientX,e.clientY);
+ },120);
+}
+function moveTouchGhost(x,y){
+ if(touchDrag.ghost){
+   touchDrag.ghost.style.left=x+"px";
+   touchDrag.ghost.style.top=y+"px";
+ }
+ const el=document.elementFromPoint(x,y);
+ const slot=el&&el.closest(".slot");
+ const rz=el&&el.closest("#returnZone");
+ document.querySelectorAll(".slot").forEach(z=>z.classList.toggle("over",z===slot));
+ $("returnZone").classList.toggle("over",!!rz);
+}
+function finishTouchDrag(e){
+ const card=touchDrag.source;
+ if(card)clearTimeout(card._touchTimer);
+ if(!touchDrag.id)return;
+ const id=touchDrag.id;
+ if(touchDrag.active){
+   const el=document.elementFromPoint(e.clientX,e.clientY);
+   const slot=el&&el.closest(".slot");
+   const rz=el&&el.closest("#returnZone");
+   if(slot)place(id,Number(slot.dataset.i));
+   else if(rz)removeCardToBank(id);
+ }
+ if(touchDrag.ghost)touchDrag.ghost.remove();
+ if(card)card.classList.remove("dragging");
+ document.querySelectorAll(".slot").forEach(z=>z.classList.remove("over"));
+ $("returnZone").classList.remove("over");
+ touchDrag={id:null,ghost:null,source:null,active:false};
+}
+
+function attachTouch(card){
+ card.addEventListener("pointerdown",e=>beginTouchDrag(card,e));
+ card.addEventListener("pointermove",e=>{
+   if(touchDrag.id===card.dataset.id && touchDrag.active){
+     e.preventDefault();
+     moveTouchGhost(e.clientX,e.clientY);
+   }
+ });
+ card.addEventListener("pointerup",finishTouchDrag);
+ card.addEventListener("pointercancel",finishTouchDrag);
+}
+
+function step(n){["m1","m2","m3","m4"].forEach((x,i)=>$(x).classList.toggle("active",i===n-1))}
+function validate(){
+ if(order.some(x=>!x)){error("Completa los ocho espacios antes de ejecutar el programa.");return}
+ if(order.every((x,i)=>x===correct[i])){$("errorFeedback").classList.remove("show");$("successFeedback").classList.add("show");validated=true;step(2);return}
+ $("hintText").textContent=["¿Qué debe ocurrir antes de que las bolitas comiencen a moverse?","Piensa: ¿el programa puede detectar un contacto antes de comenzar a moverse?","Después de comprobar el contacto, ¿qué debería hacer el programa?"][hint++%3];
+ error();
+}
+function error(msg){$("errorFeedback").classList.add("show");$("successFeedback").classList.remove("show");if(msg)$("hintText").textContent=msg;step(2)}
+function canvas(){let c=$("simCanvas"),r=c.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1);c.width=Math.max(300,r.width*d);c.height=Math.max(260,r.height*d);let ctx=c.getContext("2d");ctx.setTransform(d,0,0,d,0,0);return [r.width,r.height]}
+function build(){
+ let [w,h]=canvas();p=[];let n=cfg.healthy+cfg.infected;
+ for(let i=0;i<n;i++){let r=10+Math.random()*3;p.push({x:r+Math.random()*(w-2*r),y:r+Math.random()*(h-2*r),vx:(Math.random()-.5)*1.15*cfg.speed,vy:(Math.random()-.5)*1.15*cfg.speed,r,infected:i<cfg.infected,pulse:0})}
+ update();draw()
+}
+function update(){let inf=p.filter(x=>x.infected).length;$("healthy").textContent=p.length-inf;$("infected").textContent=inf;$("total").textContent=p.length;$("time").textContent=elapsed.toFixed(1)+" s"}
+function collisions(){
+ for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){let a=p[i],b=p[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),min=a.r+b.r;
+  if(d<min){if(a.infected!==b.infected){a.infected=b.infected=true;a.pulse=b.pulse=.35}if(d){let nx=dx/d,ny=dy/d,o=(min-d)/2;a.x-=nx*o;a.y-=ny*o;b.x+=nx*o;b.y+=ny*o}}
+ }
+}
+function draw(){
+ let c=$("simCanvas"),r=c.getBoundingClientRect(),d=Math.min(2,devicePixelRatio||1),ctx=c.getContext("2d");ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,r.width,r.height);
+ ctx.fillStyle="#f4f8fa";ctx.fillRect(0,0,r.width,r.height);ctx.strokeStyle="#dbe7ed";for(let x=20;x<r.width;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,r.height);ctx.stroke()}for(let y=20;y<r.height;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke()}
+ p.forEach(a=>{ctx.beginPath();ctx.arc(a.x,a.y,a.r+(a.pulse?5*a.pulse:0),0,Math.PI*2);ctx.fillStyle=a.infected?"#d9534f":"#35a66d";ctx.fill();ctx.lineWidth=2;ctx.strokeStyle="#fff";ctx.stroke();ctx.beginPath();ctx.arc(a.x-a.r*.3,a.y-a.r*.3,a.r*.22,0,Math.PI*2);ctx.fillStyle="rgba(255,255,255,.75)";ctx.fill()});
+ ctx.fillStyle="#526a78";ctx.font="700 13px system-ui";ctx.fillText("Contacto → cambio de estado",14,r.height-14)
+}
+function loop(t){if(!running)return;if(!paused){let dt=Math.min(.035,(t-last)/1000);last=t;elapsed+=dt;let [w,h]=canvas();p.forEach(a=>{a.x+=a.vx*dt*60;a.y+=a.vy*dt*60;if(a.x<=a.r){a.x=a.r;a.vx=Math.abs(a.vx)}if(a.x>=w-a.r){a.x=w-a.r;a.vx=-Math.abs(a.vx)}if(a.y<=a.r){a.y=a.r;a.vy=Math.abs(a.vy)}if(a.y>=h-a.r){a.y=h-a.r;a.vy=-Math.abs(a.vy)}a.pulse=Math.max(0,a.pulse-dt)});collisions();update();}draw();raf=requestAnimationFrame(loop)}
+function start(){if(!validated)return;$("simPanel").classList.add("show");$("observeNext").style.display="flex";$("experiment").classList.remove("show");$("reflection").classList.remove("show");step(3);resetSim();$("simPanel").scrollIntoView({behavior:"smooth"})}
+function resetSim(){cancelAnimationFrame(raf);elapsed=0;paused=false;running=true;build();last=performance.now();raf=requestAnimationFrame(loop)}
+$("runBtn").onclick=validate;
+$("reviewBtn").onclick=()=>$("orderingPanel").scrollIntoView({behavior:"smooth"});
+$("simBtn").onclick=start;
+$("experimentBtn").onclick=()=>{
+  $("experiment").classList.add("show");
+  $("observeNext").style.display="none";
+  step(4);
+  $("experiment").scrollIntoView({behavior:"smooth",block:"start"});
+};
+$("reflectionBtn").onclick=()=>{
+  $("reflection").classList.add("show");
+  $("experiment-next");
+  $("reflection").scrollIntoView({behavior:"smooth",block:"start"});
+};
+$("pauseBtn").onclick=()=>paused=true;
+$("continueBtn").onclick=()=>{if($("simPanel").classList.contains("show")){paused=false;running=true;last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}};
+$("restartSimBtn").onclick=resetSim;
+document.querySelectorAll("[data-key]").forEach(b=>b.onclick=()=>{let k=b.dataset.key;cfg[k]=Math.min(k==="healthy"?30:8,Math.max(1,cfg[k]+ +b.dataset.delta));$(k+"Cfg").textContent=cfg[k]});
+document.querySelectorAll(".speed").forEach(b=>b.onclick=()=>{document.querySelectorAll(".speed").forEach(x=>x.classList.remove("active"));b.classList.add("active");cfg.speed=+b.dataset.speed});
+$("tryAgainBtn").onclick=()=>{
+  resetSim();
+  $("reflection").classList.remove("show");
+};
+$("finishBtn").onclick=()=>$("doneMsg").style.display="block";
+$("projectionBtn").onclick=()=>{document.body.classList.toggle("projection");$("projectionBtn").textContent=document.body.classList.contains("projection")?"Salir de proyección":"Modo proyección"};
+document.onkeydown=e=>{if(e.key==="Escape"&&document.body.classList.contains("projection")){$("projectionBtn").click()}};
+$("resetAllBtn").onclick=()=>{cancelAnimationFrame(raf);running=false;order=Array(8).fill(null);validated=false;hint=0;cfg={healthy:10,infected:1,speed:1};$("errorFeedback").classList.remove("show");$("successFeedback").classList.remove("show");$("simPanel").classList.remove("show");$("observeNext").style.display="flex";$("experiment").classList.remove("show");$("reflection").classList.remove("show");$("doneMsg").style.display="none";document.querySelectorAll("textarea").forEach(x=>x.value="");document.querySelectorAll(".speed").forEach(x=>x.classList.toggle("active",x.dataset.speed==="1"));$("healthyCfg").textContent=10;$("infectedCfg").textContent=1;step(1);render();scrollTo({top:0,behavior:"smooth"})};
+render();window.onresize=()=>{if($("simPanel").classList.contains("show")){canvas();draw()}};
+</script>
+</body>
+</html>

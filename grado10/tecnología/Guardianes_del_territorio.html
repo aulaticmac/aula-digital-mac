@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lo que sabemos — Guardianes del territorio</title>
+<style>
+  :root{
+    --bg:#f4f7f3;
+    --card:#ffffff;
+    --primary:#245c45;
+    --secondary:#3f7d5b;
+    --accent:#e8b84a;
+    --text:#24302a;
+    --muted:#66736b;
+    --line:#d9e1db;
+    --ok:#2f7d4b;
+    --bad:#b64a3a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.5;
+  }
+  header{
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    color:white;
+    padding:28px 20px 24px;
+  }
+  .wrap{max-width:1050px;margin:auto}
+  h1{margin:0 0 8px;font-size:clamp(1.6rem,4vw,2.4rem)}
+  .subtitle{margin:0;opacity:.95}
+  nav{
+    background:white;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:10px 0;
+  }
+  .tab{
+    border:0;
+    background:#edf2ee;
+    color:var(--primary);
+    padding:11px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    flex:1 1 190px;
+  }
+  .tab.active{
+    background:var(--primary);
+    color:white;
+  }
+  main{padding:24px 0 45px}
+  .panel{display:none}
+  .panel.active{display:block}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px;
+    margin-bottom:18px;
+    box-shadow:0 4px 12px rgba(36,92,69,.06);
+  }
+  h2{color:var(--primary);margin-top:0}
+  h3{color:var(--secondary)}
+  .instructions{
+    background:#f0f6f1;
+    border-left:5px solid var(--secondary);
+    padding:13px 16px;
+    border-radius:8px;
+  }
+  .clues{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin-top:18px;
+  }
+  .clue{
+    background:#fffdf4;
+    border:2px dashed #d8bd67;
+    border-radius:12px;
+    padding:20px 12px;
+    text-align:center;
+    font-size:1.08rem;
+    font-weight:700;
+  }
+  .machine{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:25px 0;
+    font-weight:800;
+    font-size:1.15rem;
+  }
+  .machine .box{
+    padding:14px 17px;
+    border:2px solid var(--secondary);
+    border-radius:10px;
+    background:#f2f8f3;
+  }
+  .machine .missing{
+    border-style:dashed;
+    background:#fffdf4;
+    color:#876b18;
+  }
+  .arrow{font-size:1.5rem;color:var(--secondary)}
+  .options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+  .option{
+    border:2px solid var(--line);
+    background:white;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .option:hover{border-color:var(--secondary)}
+  .option.selected{border-color:var(--primary);background:#eaf3ec}
+  .feedback{
+    margin-top:16px;
+    font-weight:700;
+    min-height:26px;
+  }
+  .correct{color:var(--ok)}
+  .incorrect{color:var(--bad)}
+  .question{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px;
+    margin:15px 0;
+    background:#fbfcfb;
+  }
+  .match-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px 24px;
+    align-items:center;
+  }
+  .match-item{
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:white;
+  }
+  select{
+    width:100%;
+    padding:11px;
+    border:2px solid var(--line);
+    border-radius:9px;
+    background:white;
+    font-size:1rem;
+  }
+  .check{
+    margin-top:18px;
+    background:var(--primary);
+    color:white;
+    border:0;
+    border-radius:10px;
+    padding:12px 18px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .reset{
+    background:#eef2ef;
+    color:var(--primary);
+    margin-left:8px;
+  }
+  .bridge{
+    background:#f8f4e7;
+    border:1px solid #e5d6a1;
+    border-radius:12px;
+    padding:16px;
+    margin-top:18px;
+  }
+  .note{
+    color:var(--muted);
+    font-size:.95rem;
+  }
+  .drag-layout{
+    display:grid;
+    grid-template-columns:1fr 1.25fr;
+    gap:22px;
+    margin-top:22px;
+  }
+  .source-area,.sequence-area{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+    background:#fbfcfb;
+  }
+  .source-area h3,.sequence-area h3{
+    margin-top:0;
+  }
+  .drag-items{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .drag-item{
+    padding:14px 16px;
+    border:2px solid var(--line);
+    border-radius:10px;
+    background:white;
+    cursor:grab;
+    font-weight:700;
+    user-select:none;
+    touch-action:none;
+  }
+  .drag-item:active{cursor:grabbing}
+  .drag-item.selected{
+    border-color:var(--primary);
+    background:#eaf3ec;
+  }
+  .drop-zones{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .drop-zone{
+    min-height:58px;
+    border:2px dashed #b8c8bd;
+    border-radius:10px;
+    background:white;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:8px;
+    transition:.15s ease;
+  }
+  .drop-zone > span{
+    width:34px;
+    height:34px;
+    flex:0 0 34px;
+    border-radius:50%;
+    background:#edf2ee;
+    color:var(--primary);
+    display:grid;
+    place-items:center;
+    font-weight:800;
+  }
+  .drop-zone.drag-over{
+    border-color:var(--secondary);
+    background:#f0f7f2;
+  }
+  .drop-zone .drop-placeholder{
+    color:var(--muted);
+    font-size:.95rem;
+  }
+  .drop-zone .drag-item{
+    width:100%;
+    margin:0;
+  }
+  .touch-help{
+    margin-top:14px;
+    padding:11px 13px;
+    background:#f8f4e7;
+    border:1px solid #e5d6a1;
+    border-radius:9px;
+    color:#5f522a;
+    font-size:.92rem;
+  }
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:16px;
+  }
+  .actions .reset{margin-left:0}
+  .drop-zone.correct{
+    border-color:var(--ok);
+    background:#f1f8f3;
+  }
+  .drop-zone.incorrect{
+    border-color:var(--bad);
+    background:#fff5f3;
+  }
+  @media(max-width:650px){
+    .match-grid{grid-template-columns:1fr}
+    .tab{flex-basis:100%}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Guardianes del territorio</h1>
+    <p class="subtitle">Lo que sabemos · Desafío de activación</p>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap tabs">
+    <button class="tab active" onclick="showTab(0)">1. ¿Qué recuerda tu equipo?</button>
+    <button class="tab" onclick="showTab(1)">2. ¿Qué información necesita?</button>
+    <button class="tab" onclick="showTab(2)">3. Completa la máquina</button>
+    <button class="tab" onclick="showTab(3)">4. Recuperación de Micro:bit</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- TAB 1 -->
+  <section class="panel active">
+    <div class="card">
+      <h2>Desafío de memoria — “¿Qué recuerda tu equipo?”</h2>
+      <p>
+        Recuperemos lo que aprendimos en la actividad anterior. Los cinco elementos
+        están desordenados. Organicenlos para reconstruir la secuencia que siguió
+        el sistema tecnológico.
+      </p>
+
+      <div class="instructions">
+        <strong>Reto:</strong> arrastren cada elemento desde la lista hasta el cuadro
+        que consideren que ocupa su posición correcta. Cuando hayan completado las
+        cinco posiciones, presionen <strong>Verificar</strong>.
+      </div>
+
+      <div class="drag-layout">
+        <div class="source-area">
+          <h3>Elementos desordenados</h3>
+          <div id="dragItems" class="drag-items" aria-label="Elementos para ordenar">
+            <div class="drag-item" draggable="true" data-value="Temperatura">🌡️ Temperatura</div>
+            <div class="drag-item" draggable="true" data-value="Acción">⚙️ Acción</div>
+            <div class="drag-item" draggable="true" data-value="Condición">❓ Condición</div>
+            <div class="drag-item" draggable="true" data-value="Dato">📊 Dato</div>
+            <div class="drag-item" draggable="true" data-value="Alarma">🔔 Alarma</div>
+          </div>
+        </div>
+
+        <div class="sequence-area">
+          <h3>Construyan la secuencia</h3>
+          <div id="dropZones" class="drop-zones">
+            <div class="drop-zone" data-position="1"><span>1</span><div class="drop-placeholder">Arrastra aquí</div></div>
+            <div class="drop-zone" data-position="2"><span>2</span><div class="drop-placeholder">Arrastra aquí</div></div>
+            <div class="drop-zone" data-position="3"><span>3</span><div class="drop-placeholder">Arrastra aquí</div></div>
+            <div class="drop-zone" data-position="4"><span>4</span><div class="drop-placeholder">Arrastra aquí</div></div>
+            <div class="drop-zone" data-position="5"><span>5</span><div class="drop-placeholder">Arrastra aquí</div></div>
+          </div>
+
+          <div class="touch-help">
+            <strong>En pantalla táctil:</strong> si no pueden arrastrar, toquen primero
+            un elemento y luego el cuadro donde quieren colocarlo.
+          </div>
+
+          <div class="actions">
+            <button class="check" type="button" onclick="checkSequence()">Verificar</button>
+            <button class="check reset" type="button" onclick="resetSequence()">Reiniciar</button>
+          </div>
+          <div id="sequenceFeedback" class="feedback" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2 -->
+  <section class="panel">
+    <div class="card">
+      <h2>¿Qué información necesita?</h2>
+      <p>
+        Los sistemas tecnológicos necesitan obtener información del entorno para
+        poder actuar. Relacionen cada situación con la información que el sistema necesita conocer.
+      </p>
+
+      <div class="instructions">
+        <strong>Reto:</strong> seleccionen en cada lista la opción que corresponde.
+        Piensen qué tendría que conocer el sistema antes de tomar una decisión.
+      </div>
+
+      <div class="question">
+        <div class="match-grid">
+          <div class="match-item"><strong>🌬️ Ventilador</strong></div>
+          <div>
+            <select class="match" data-answer="Temperatura">
+              <option value="">— Selecciona —</option>
+              <option>Temperatura</option>
+              <option>Nivel de luz</option>
+              <option>Humedad</option>
+              <option>Movimiento</option>
+              <option>Nivel de iluminación</option>
+            </select>
+          </div>
+
+          <div class="match-item"><strong>💡 Lámpara</strong></div>
+          <div>
+            <select class="match" data-answer="Nivel de luz">
+              <option value="">— Selecciona —</option>
+              <option>Temperatura</option>
+              <option>Nivel de luz</option>
+              <option>Humedad</option>
+              <option>Movimiento</option>
+              <option>Nivel de iluminación</option>
+            </select>
+          </div>
+
+          <div class="match-item"><strong>💧 Riego</strong></div>
+          <div>
+            <select class="match" data-answer="Humedad">
+              <option value="">— Selecciona —</option>
+              <option>Temperatura</option>
+              <option>Nivel de luz</option>
+              <option>Humedad</option>
+              <option>Movimiento</option>
+              <option>Nivel de iluminación</option>
+            </select>
+          </div>
+
+          <div class="match-item"><strong>🚨 Alarma</strong></div>
+          <div>
+            <select class="match" data-answer="Movimiento">
+              <option value="">— Selecciona —</option>
+              <option>Temperatura</option>
+              <option>Nivel de luz</option>
+              <option>Humedad</option>
+              <option>Movimiento</option>
+              <option>Nivel de iluminación</option>
+            </select>
+          </div>
+
+          <div class="match-item"><strong>📱 Celular</strong></div>
+          <div>
+            <select class="match" data-answer="Nivel de iluminación">
+              <option value="">— Selecciona —</option>
+              <option>Temperatura</option>
+              <option>Nivel de luz</option>
+              <option>Humedad</option>
+              <option>Movimiento</option>
+              <option>Nivel de iluminación</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="check" onclick="checkMatches()">Comprobar respuestas</button>
+        <button class="check reset" onclick="resetMatches()">Reiniciar</button>
+        <div id="matchFeedback" class="feedback"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3 -->
+  <section class="panel">
+    <div class="card">
+      <h2>Completa la máquina</h2>
+
+      <p>
+        Un sistema tecnológico necesita conocer lo que está pasando antes de
+        poder procesar información y actuar.
+      </p>
+
+      <div class="machine">
+        <span class="box missing">________</span>
+        <span class="arrow">→</span>
+        <span class="box">DATO</span>
+        <span class="arrow">→</span>
+        <span class="box">DECISIÓN</span>
+        <span class="arrow">→</span>
+        <span class="box">ACCIÓN</span>
+      </div>
+
+      <div class="question">
+        <h3>¿Qué elemento falta?</h3>
+        <p>Elijan una opción:</p>
+
+        <div class="options">
+          <button class="option" onclick="chooseMachine(this,'Sensor')">Sensor</button>
+          <button class="option" onclick="chooseMachine(this,'Botón')">Botón</button>
+          <button class="option" onclick="chooseMachine(this,'Batería')">Batería</button>
+          <button class="option" onclick="chooseMachine(this,'Pantalla')">Pantalla</button>
+          <button class="option" onclick="chooseMachine(this,'Parlante')">Parlante</button>
+        </div>
+
+        <div id="machineFeedback" class="feedback"></div>
+      </div>
+
+      <p class="note">
+        El propósito de este reto es que el equipo infiera qué elemento permite
+        obtener información del entorno. La explicación formal se construirá después.
+      </p>
+    </div>
+  </section>
+
+  <!-- TAB 4 -->
+  <section class="panel">
+    <div class="card">
+      <h2>Recuperación de Micro:bit</h2>
+
+      <p>
+        Ahora conectemos este reto con lo que ya habían trabajado con Micro:bit.
+      </p>
+
+      <div class="question">
+        <h3>Recuerden la actividad anterior</h3>
+        <p>
+          <strong>¿Qué elemento utilizaba la Micro:bit para obtener la temperatura?</strong>
+        </p>
+
+        <div class="options">
+          <button class="option" onclick="chooseMicro(this,'Sensor')">Sensor</button>
+          <button class="option" onclick="chooseMicro(this,'Pantalla')">Pantalla</button>
+          <button class="option" onclick="chooseMicro(this,'Radio')">Radio</button>
+          <button class="option" onclick="chooseMicro(this,'Botón')">Botón</button>
+        </div>
+
+        <div id="microFeedback" class="feedback"></div>
+      </div>
+
+      <div class="question">
+        <h3>Piensen más allá de la temperatura</h3>
+        <p>
+          <strong>¿Qué otros tipos de información podría obtener un sistema tecnológico?</strong>
+        </p>
+        <p class="note">
+          Conversen con su equipo y den ejemplos relacionados con su entorno.
+        </p>
+      </div>
+
+      <div class="bridge">
+        <strong>Puente hacia la siguiente actividad:</strong>
+        hoy estamos recuperando una idea que será fundamental para el reto:
+        un sistema necesita obtener información del entorno para poder trabajar con ella.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+let draggedItem = null;
+let selectedItem = null;
+let pointerState = null;
+
+function initDragDrop(){
+  const items = document.querySelectorAll('#dragItems .drag-item');
+  const zones = document.querySelectorAll('#dropZones .drop-zone');
+
+  items.forEach(item => {
+    item.addEventListener('dragstart', e => {
+      draggedItem = item;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', item.dataset.value);
+      item.classList.add('selected');
+    });
+
+    item.addEventListener('dragend', () => {
+      item.classList.remove('selected');
+      draggedItem = null;
+      zones.forEach(z => z.classList.remove('drag-over'));
+    });
+
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.drag-item').forEach(i => i.classList.remove('selected'));
+      selectedItem = item;
+      item.classList.add('selected');
+    });
+
+    // Pointer Events: works more reliably on touch screens and in embedded/offline browsers.
+    item.addEventListener('pointerdown', startPointerDrag);
+  });
+
+  zones.forEach(zone => {
+    zone.addEventListener('dragover', event => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drag-over');
+    });
+
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+
+    zone.addEventListener('drop', event => {
+      event.preventDefault();
+      zone.classList.remove('drag-over');
+      if(draggedItem) placeItem(draggedItem, zone);
+    });
+
+    zone.addEventListener('click', () => {
+      if(selectedItem){
+        placeItem(selectedItem, zone);
+        selectedItem = null;
+      }
+    });
+  });
+}
+
+function startPointerDrag(event){
+  if(event.button !== undefined && event.button !== 0) return;
+
+  const item = event.currentTarget;
+  pointerState = {
+    item,
+    pointerId: event.pointerId,
+    startX: event.clientX,
+    startY: event.clientY,
+    moved: false
+  };
+
+  item.setPointerCapture?.(event.pointerId);
+
+  const move = e => {
+    if(!pointerState || e.pointerId !== pointerState.pointerId) return;
+
+    const dx = e.clientX - pointerState.startX;
+    const dy = e.clientY - pointerState.startY;
+
+    if(Math.hypot(dx,dy) > 6){
+      pointerState.moved = true;
+      document.body.style.userSelect = 'none';
+      item.classList.add('selected');
+      highlightZoneAt(e.clientX,e.clientY);
+    }
+  };
+
+  const up = e => {
+    if(!pointerState || e.pointerId !== pointerState.pointerId) return;
+
+    const state = pointerState;
+    pointerState = null;
+    document.body.style.userSelect = '';
+
+    const target = document.elementFromPoint(e.clientX,e.clientY);
+    const zone = target?.closest('.drop-zone');
+
+    document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+
+    if(state.moved && zone){
+      placeItem(state.item, zone);
+      selectedItem = null;
+    }else if(!state.moved){
+      document.querySelectorAll('.drag-item').forEach(i => i.classList.remove('selected'));
+      selectedItem = state.item;
+      state.item.classList.add('selected');
+    }else{
+      state.item.classList.remove('selected');
+    }
+
+    item.releasePointerCapture?.(e.pointerId);
+    item.removeEventListener('pointermove', move);
+    item.removeEventListener('pointerup', up);
+    item.removeEventListener('pointercancel', cancel);
+  };
+
+  const cancel = e => {
+    pointerState = null;
+    document.body.style.userSelect = '';
+    item.classList.remove('selected');
+    document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+    item.releasePointerCapture?.(e.pointerId);
+    item.removeEventListener('pointermove', move);
+    item.removeEventListener('pointerup', up);
+    item.removeEventListener('pointercancel', cancel);
+  };
+
+  item.addEventListener('pointermove', move);
+  item.addEventListener('pointerup', up);
+  item.addEventListener('pointercancel', cancel);
+}
+
+function highlightZoneAt(x,y){
+  document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
+  const target = document.elementFromPoint(x,y);
+  const zone = target?.closest('.drop-zone');
+  if(zone) zone.classList.add('drag-over');
+}
+
+function placeItem(item, zone){
+  const current = zone.querySelector('.drag-item');
+
+  if(current && current !== item){
+    document.getElementById('dragItems').appendChild(current);
+    current.classList.remove('selected');
+  }
+
+  const placeholder = zone.querySelector('.drop-placeholder');
+  if(placeholder) placeholder.remove();
+
+  zone.appendChild(item);
+  item.classList.remove('selected');
+  item.setAttribute('draggable','true');
+
+  updatePlaceholders();
+  clearSequenceFeedback();
+}
+
+function updatePlaceholders(){
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    if(!zone.querySelector('.drag-item') && !zone.querySelector('.drop-placeholder')){
+      const p=document.createElement('div');
+      p.className='drop-placeholder';
+      p.textContent='Arrastra aquí';
+      zone.appendChild(p);
+    }
+  });
+}
+
+function checkSequence(){
+  const zones=[...document.querySelectorAll('.drop-zone')];
+  const expected=['Temperatura','Dato','Condición','Alarma','Acción'];
+  let filled=0;
+  let correct=0;
+
+  zones.forEach((zone,index)=>{
+    zone.classList.remove('correct','incorrect');
+    const item=zone.querySelector('.drag-item');
+
+    if(item){
+      filled++;
+      if(item.dataset.value===expected[index]){
+        correct++;
+        zone.classList.add('correct');
+      }else{
+        zone.classList.add('incorrect');
+      }
+    }
+  });
+
+  const feedback=document.getElementById('sequenceFeedback');
+
+  if(filled<5){
+    feedback.className='feedback incorrect';
+    feedback.textContent='Completen las cinco posiciones antes de verificar.';
+  }else if(correct===5){
+    feedback.className='feedback correct';
+    feedback.textContent='¡Excelente! Reconstruyeron correctamente la secuencia.';
+  }else{
+    feedback.className='feedback incorrect';
+    feedback.textContent=`Hay ${correct} de 5 posiciones correctas. Revisen las posiciones marcadas y vuelvan a intentarlo.`;
+  }
+}
+
+function resetSequence(){
+  const source=document.getElementById('dragItems');
+
+  document.querySelectorAll('.drop-zone .drag-item').forEach(item=>{
+    source.appendChild(item);
+  });
+
+  updatePlaceholders();
+
+  document.querySelectorAll('.drop-zone').forEach(zone=>{
+    zone.classList.remove('correct','incorrect','drag-over');
+  });
+
+  clearSequenceFeedback();
+  selectedItem=null;
+  document.querySelectorAll('.drag-item').forEach(item=>item.classList.remove('selected'));
+}
+
+function clearSequenceFeedback(){
+  const feedback=document.getElementById('sequenceFeedback');
+  feedback.className='feedback';
+  feedback.textContent='';
+}
+
+function showTab(index){
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',i===index));
+  document.querySelectorAll('.panel').forEach((p,i)=>p.classList.toggle('active',i===index));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function checkMatches(){
+  const items=[...document.querySelectorAll('.match')];
+  let correct=0, answered=0;
+
+  items.forEach(select=>{
+    if(select.value) answered++;
+    if(select.value===select.dataset.answer) correct++;
+  });
+
+  const feedback=document.getElementById('matchFeedback');
+
+  if(answered<items.length){
+    feedback.className='feedback incorrect';
+    feedback.textContent='Completen todas las relaciones antes de comprobar.';
+  }else if(correct===items.length){
+    feedback.className='feedback correct';
+    feedback.textContent='¡Muy bien! Todas las relaciones son correctas.';
+  }else{
+    feedback.className='feedback incorrect';
+    feedback.textContent=`Tienen ${correct} de ${items.length} relaciones correctas. Revisen las que no coinciden y vuelvan a intentarlo.`;
+  }
+}
+
+function resetMatches(){
+  document.querySelectorAll('.match').forEach(s=>s.value='');
+  const f=document.getElementById('matchFeedback');
+  f.className='feedback';
+  f.textContent='';
+}
+
+function chooseMachine(button,answer){
+  document.querySelectorAll('#machineFeedback').forEach(f=>f.textContent='');
+  document.querySelectorAll('.option').forEach(b=>b.classList.remove('selected'));
+  button.classList.add('selected');
+
+  const f=document.getElementById('machineFeedback');
+
+  if(answer==='Sensor'){
+    f.className='feedback correct';
+    f.textContent='¡Correcto! El sistema necesita un sensor para obtener información del entorno.';
+  }else{
+    f.className='feedback incorrect';
+    f.textContent='Todavía no. Piensen: ¿qué elemento permite conocer algo que está ocurriendo en el entorno?';
+  }
+}
+
+function chooseMicro(button,answer){
+  const parent=button.closest('.question');
+  parent.querySelectorAll('.option').forEach(b=>b.classList.remove('selected'));
+  button.classList.add('selected');
+
+  const f=document.getElementById('microFeedback');
+
+  if(answer==='Sensor'){
+    f.className='feedback correct';
+    f.textContent='¡Correcto! La temperatura se obtiene mediante un sensor.';
+  }else{
+    f.className='feedback incorrect';
+    f.textContent='Revisen la función de cada elemento: ¿cuál permite obtener información del entorno?';
+  }
+}
+
+initDragDrop();
+</script>
+
+</body>
+</html>
